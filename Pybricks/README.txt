@@ -26,7 +26,13 @@ from stdin.
 Programs:
 =========
 
-Pybricks_test_asynv.py
+Pybricks_simulation.py
+-----------------------
+
+Performs an asynchronous simulation of 4 accumulators that can be charged and
+discharged. The accumulators are controlled via the console. 
+
+Pybricks_test_async.py
 ----------------------
 
 Example usage of the EventLoop from the library pylib_async.py. This Example
