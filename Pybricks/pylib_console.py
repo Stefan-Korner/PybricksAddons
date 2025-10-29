@@ -13,7 +13,7 @@ class ConsoleHandler:
     def __init__(self, command_handler=None):
         self.command_buffer = ""
         if command_handler == None:
-            self.command_handler = self
+            self.command_handler = self.handle
         else:
             self.command_handler = command_handler
         # Register stdin for polling. This allows to wait for incoming data
@@ -30,7 +30,7 @@ class ConsoleHandler:
             next_char = str(stdin.buffer.read(1), "utf-8")
             if next_char == "\r":
                 print("")
-                if self.command_handler.handle(self.command_buffer):
+                if self.command_handler(self.command_buffer):
                     # Let the remote program know we are ready for a command.
                     print(PROMPT, end="")
                 self.command_buffer = ""
