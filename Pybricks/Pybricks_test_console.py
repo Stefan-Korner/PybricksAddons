@@ -1,6 +1,6 @@
-#------------------------------------------------------------------------------
-# Tests the pylib_console.
-#------------------------------------------------------------------------------
+#******************************************************************************
+# Tests the pylib_console.                                                    *
+#******************************************************************************
 from pybricks.tools import wait
 from pylib_console import ConsoleHandler
 
@@ -18,15 +18,17 @@ class TestConsoleHandler(ConsoleHandler):
             self.poll()
             wait(10)
 
-    # Handle the command.
-    def handle(self, command):
-        upper_command = command.upper()
-        if upper_command != "":
-            print("command = " + command)
-        if upper_command == "X" or upper_command == "EXIT":
+    # Handle the command line.
+    def handle(self, command_line):
+        command_tokens = command_line.split()
+        command = "".join(command_tokens[0:1]).upper()
+        args = command_tokens[1:]
+        if command != "":
+            print("command input =", command, " ".join(args))
+        if command == "X" or command == "EXIT":
             print("The program was stopped (Exit).")
             self.running = False
-        elif upper_command == "?" or upper_command == "HELP":
+        elif command == "?" or command == "HELP":
             print("X | EXIT ... terminates the program")
             print("? | HELP ... prints available commands")
         # Show the prompt when True.

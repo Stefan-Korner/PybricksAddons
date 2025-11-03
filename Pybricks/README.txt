@@ -12,6 +12,12 @@ EventLoop via yield calls. In addition this library provides the generic
 condition WaitFor and the specific conditions WaitForAbsoluteTime,
 WaitForRelativeTime, WaitForTaskCompleted.
 
+pylib_bg_logger.py
+------------------
+
+Provides a background logger that buffers log messages from background task.
+The buffered log messages can be retrieved or printed on demand.
+
 pylib_console.py
 ----------------
 
@@ -38,6 +44,13 @@ Pybricks_test_async.py
 Example usage of the EventLoop from the library pylib_async.py. This Example
 has 3 cooperative running tasks and it uses the conditions WaitForRelativeTime
 and WaitForTaskCompleted for timing and synchronizing.
+
+Pybricks_test_bg_logger.py
+--------------------------
+
+Example usage of the Logger from the library pylib_bg_logger.py. This Example
+has 2 background worker tasks and a console task. The worker tasks are
+generating log messages in background. These messages can be printed on demand.
 
 Pybricks_test_console.py
 ------------------------

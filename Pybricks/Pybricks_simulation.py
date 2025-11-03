@@ -1,6 +1,6 @@
-#------------------------------------------------------------------------------
-# Tests the pylib_async and pylib_console.
-#------------------------------------------------------------------------------
+#******************************************************************************
+# Tests the pylib_async and pylib_console.                                    *
+#******************************************************************************
 from pylib_async import EventLoop, WaitFor, WaitForRelativeTime
 from pylib_console import ConsoleHandler
 
@@ -92,6 +92,7 @@ def accu_bar(accu_state):
 # Prints the state of all accus.
 def print_accu_states():
     global s_accu_state1, s_accu_state2, s_accu_state3, s_accu_state4
+    print("")
     print("   accu1        accu2        accu3        accu4")
     print("+----------  +----------  +----------  +----------")
     print("|" + accu_bar(s_accu_state1) + "  " +
@@ -101,48 +102,43 @@ def print_accu_states():
     print("+----------  +----------  +----------  +----------")
 
 
-# Handle the command.
-def handle(command):
+# Handle the command line.
+def handle(command_line):
     global s_running, s_charge_state1, s_charge_state2, s_charge_state3, s_charge_state4
-    upper_command = command.upper()
-    if upper_command != "":
-        print("command = " + command)
-    if upper_command == "X" or upper_command == "EXIT":
+    command_tokens = command_line.split()
+    command = "".join(command_tokens[0:1]).upper()
+    args = command_tokens[1:]
+    arg1 = "".join(command_tokens[1:2])
+    if command == "X" or command == "EXIT":
         s_running = False
-    elif upper_command == "?" or upper_command == "HELP":
-        print("X | EXIT ... terminates the program")
-        print("? | HELP ... prints available commands")
-        print("1+ ......... charge accu1")
-        print("1- ......... discharge accu1")
-        print("2+ ......... charge accu2")
-        print("2- ......... discharge accu2")
-        print("3+ ......... charge accu3")
-        print("3- ......... discharge accu3")
-        print("4+ ......... charge accu4")
-        print("4- ......... discharge accu4")
+    elif command == "?" or command == "HELP":
+        print("X | EXIT ............... terminates the program")
+        print("? | HELP ............... prints available commands")
+        print("C | CHARGE <accu> ...... charge an accu 1-4")
+        print("D | DISCHARGE <accu> ... discharge an accu 1-4")
         print_accu_states()
-    elif upper_command == "1+":
+    elif command == "C" and arg1 == "1":
         print("charge accu1...")
         s_charge_state1 = CHARGE_STATE_CHARGE
-    elif upper_command == "1-":
+    elif command == "D" and arg1 == "1":
         print("discharge accu1...")
         s_charge_state1 = CHARGE_STATE_DISCHARGE
-    elif upper_command == "2+":
+    elif command == "C" and arg1 == "2":
         print("charge accu2...")
         s_charge_state2 = CHARGE_STATE_CHARGE
-    elif upper_command == "2-":
+    elif command == "D" and arg1 == "2":
         print("discharge accu2...")
         s_charge_state2 = CHARGE_STATE_DISCHARGE
-    elif upper_command == "3+":
+    elif command == "C" and arg1 == "3":
         print("charge accu3...")
         s_charge_state3 = CHARGE_STATE_CHARGE
-    elif upper_command == "3-":
+    elif command == "D" and arg1 == "3":
         print("discharge accu3...")
         s_charge_state3 = CHARGE_STATE_DISCHARGE
-    elif upper_command == "4+":
+    elif command == "C" and arg1 == "4":
         print("charge accu4...")
         s_charge_state4 = CHARGE_STATE_CHARGE
-    elif upper_command == "4-":
+    elif command == "D" and arg1 == "4":
         print("discharge accu4...")
         s_charge_state4 = CHARGE_STATE_DISCHARGE
     # Show the prompt when True.

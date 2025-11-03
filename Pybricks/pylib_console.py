@@ -38,9 +38,9 @@ class ConsoleHandler:
                 print(next_char, end="")
                 self.command_buffer += next_char
 
-    # Handle the command - default implementation.
-    def handle(self, command):
-        if command != "":
-            print("command = " + command)
+    # Handle the command line - default implementation.
+    def handle(self, command_line):
+        if command_line != "":
+            print("command_line = " + command_line)
         # Show the prompt when True.
         return True
