@@ -1,8 +1,41 @@
 #******************************************************************************
 # Logger for background tasks.                                                *
 #******************************************************************************
+s_logger = None
 
 
+# Convenience helper that delegates to the s_logger instance.
+def bg_log(message):
+    global s_logger
+    s_logger.log(message)
+
+# Convenience helper that delegates to the s_logger instance.
+def clean_bg_log_messages():
+    global s_logger
+    s_logger.clean_log_messages()
+
+# Convenience helper that delegates to the s_logger instance.
+def get_bg_log_messages():
+    global s_logger
+    s_logger.get_log_messages()
+
+# Convenience helper that delegates to the s_logger instance.
+def get_bg_log_messages_and_clean():
+    global s_logger
+    s_logger.get_log_messages_and_clean()
+
+# Convenience helper that delegates to the s_logger instance.
+def print_bg_log_messages():
+    global s_logger
+    s_logger.print_log_messages()
+
+# Convenience helper that delegates to the s_logger instance.
+def print_bg_log_messages_and_clean():
+    global s_logger
+    s_logger.print_log_messages_and_clean()
+
+
+# The bachgound logger instance.
 class Logger:
 
     def __init__(self, command_handler=None):
@@ -36,3 +69,7 @@ class Logger:
         for message in self.log_buffer:
             print(message)
         self.log_buffer = []
+
+
+# Logger initializer.
+s_logger = Logger()
