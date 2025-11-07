@@ -4,7 +4,6 @@
 from pybricks.tools import wait
 from pylib_console import ConsoleHandler
 
-
 class TestConsoleHandler(ConsoleHandler):
     
     def __init__(self):
@@ -33,7 +32,6 @@ class TestConsoleHandler(ConsoleHandler):
             print("? | HELP ... prints available commands")
         # Show the prompt when True.
         return self.running
-
 
 console_handler = TestConsoleHandler()
 console_handler.run()

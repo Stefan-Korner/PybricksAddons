@@ -7,7 +7,6 @@ from pylib_bg_logger import bg_log, print_bg_log_messages_and_clean
 
 s_running = True
 
-
 # Task 1.
 def task1():
     global s_running

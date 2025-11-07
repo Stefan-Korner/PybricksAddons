@@ -3,7 +3,6 @@
 #******************************************************************************
 import pylib_async
 
-
 # foo1a --> foo1b --> foo1c
 def foo1():
     print("foo1a")
@@ -13,7 +12,6 @@ def foo1():
     print("foo1c, event_time =", event_time)
     print("task foo1 finished")
     return 123
-
 
 # foo2a --> foo2b --> foo2c
 def foo2():
@@ -28,7 +26,6 @@ def foo2():
     print("task foo2 finished")
     return 456
 
-
 # foo3a --> foo3b --> foo3c
 def foo3():
     print("foo3a")
@@ -40,7 +37,6 @@ def foo3():
     except pylib_async.TimeoutException as ex:
         print("foo3c, exception =", ex)
     print("task foo3 finished")
-
 
 event_loop = pylib_async.EventLoop()
 event_loop.register_task(foo1(), "foo1")

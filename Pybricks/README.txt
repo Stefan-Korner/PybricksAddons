@@ -29,6 +29,12 @@ ConsoleHandler provides a prompt ">>> " to support a synchonization for a
 parent application. The class is designed to support a non-blocking reading
 from stdin.
 
+pylib_motor_calibration.py
+--------------------------
+
+Provides a caliration task (motor in zero position) and a de-calibration task
+(motor runs for 2 seconds).
+
 Programs:
 =========
 
@@ -58,3 +64,17 @@ Pybricks_test_console.py
 Example usage of the ConsoleHandler from the library pylib_concole.py. The
 ConsoleHandler class is derived by the class TestConsoleHandler that provides
 a simple poll event loop and an enhanced handle(...) method.
+
+Pybricks_test_motor_calibration.py
+----------------------------------
+
+Example usage of the motor calibration and de-calibration tasks from
+pylib_motor_calibration.py. The tasks are running in foreground and are
+blocking the console prompt.
+
+Pybricks_test_motor_calibration_bg.py
+-------------------------------------
+
+Example usage of the motor calibration and de-calibration tasks from
+pylib_motor_calibration.py. The tasks are running in background without
+blocking the console prompt.

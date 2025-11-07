@@ -18,7 +18,6 @@ s_charge_state3 = None
 s_charge_state4 = None
 s_running = None
 
-
 # Task for accu 1.
 def accu1():
     global s_accu_state1, s_charge_state1
@@ -33,7 +32,6 @@ def accu1():
         yield WaitForRelativeTime(1)
     print("accu1 stopped")
     return None
-
 
 # Task for accu 2.
 def accu2():
@@ -50,7 +48,6 @@ def accu2():
     print("accu2 stopped")
     return None
 
-
 # Task for accu 3.
 def accu3():
     global s_accu_state3, s_charge_state3
@@ -65,7 +62,6 @@ def accu3():
         yield WaitForRelativeTime(1)
     print("accu3 stopped")
     return None
-
 
 # Task for accu 4.
 def accu4():
@@ -82,12 +78,10 @@ def accu4():
     print("accu4 stopped")
     return None
 
-
 # Helper of accu printing.
 def accu_bar(accu_state):
     bar_length = int(accu_state / 10)
     return (('#' * bar_length) + (' ' * (10 - bar_length)))
-
 
 # Prints the state of all accus.
 def print_accu_states():
@@ -100,7 +94,6 @@ def print_accu_states():
           "|" + accu_bar(s_accu_state3) + "  " +
           "|" + accu_bar(s_accu_state4))
     print("+----------  +----------  +----------  +----------")
-
 
 # Handle the command line.
 def handle(command_line):
@@ -144,7 +137,6 @@ def handle(command_line):
     # Show the prompt when True.
     return s_running
 
-
 # Console task.
 def console():
     global s_running, s_accu_state1, s_accu_state2, s_accu_state3, s_accu_state4
@@ -161,7 +153,6 @@ def console():
     s_accu_state4 = None
     print("console stopped")
     return None
-
 
 event_loop = EventLoop()
 event_loop.register_task(accu1(), "accu1")

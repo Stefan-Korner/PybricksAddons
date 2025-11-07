@@ -3,7 +3,6 @@
 #******************************************************************************
 s_logger = None
 
-
 # Convenience helper that delegates to the s_logger instance.
 def bg_log(message):
     global s_logger
@@ -33,7 +32,6 @@ def print_bg_log_messages():
 def print_bg_log_messages_and_clean():
     global s_logger
     s_logger.print_log_messages_and_clean()
-
 
 # The bachgound logger instance.
 class Logger:
@@ -69,7 +67,6 @@ class Logger:
         for message in self.log_buffer:
             print(message)
         self.log_buffer = []
-
 
 # Logger initializer.
 s_logger = Logger()

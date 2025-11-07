@@ -5,7 +5,6 @@ from pybricks.tools import StopWatch, wait
 
 s_stop_watch = None
 
-
 def time_sleep(sleep_time_sec):
     wait(sleep_time_sec * 1000)
 
@@ -15,12 +14,10 @@ def time_time():
         s_stop_watch = StopWatch()
     return s_stop_watch.time() / 1000
 
-
 class TimeoutException(Exception):
 
     def __init__(self, value):
         self.value = value
-
 
 class WaitFor:
 
@@ -30,7 +27,6 @@ class WaitFor:
     def test_event(self, event_loop):
         # (condition reached, return value)
         return (True, None)
-
 
 class EventLoop:
 
@@ -94,7 +90,6 @@ class EventLoop:
     def task_return_value(self, task_name):
         return self.last_task_return_value
 
-
 class WaitForAbsoluteTime(WaitFor):
 
     def __init__(self, absolute_time):
@@ -105,12 +100,10 @@ class WaitForAbsoluteTime(WaitFor):
         time_now = time_time()
         return (self.absolute_time <= time_now, time_now)
 
-
 class WaitForRelativeTime(WaitForAbsoluteTime):
 
     def __init__(self, relative_time):
         super().__init__(time_time() + relative_time)
-
 
 class WaitForTaskCompleted(WaitFor):
 

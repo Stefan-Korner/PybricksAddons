@@ -7,6 +7,9 @@ from usys import stdin
 # Prompt to inform the PC that a new command can be processed.
 PROMPT = ">>> "
 
+# Let the remote program know we are ready for a command.
+def print_prompt():
+    print(PROMPT, end="")
 
 class ConsoleHandler:
 
@@ -21,7 +24,7 @@ class ConsoleHandler:
         self.keyboard = poll()
         self.keyboard.register(stdin)
         # Let the remote program know we are ready for a command.
-        print(PROMPT, end="")
+        print_prompt()
 
     # Fetch input from the PC.
     def poll(self):
@@ -32,7 +35,7 @@ class ConsoleHandler:
                 print("")
                 if self.command_handler(self.command_buffer):
                     # Let the remote program know we are ready for a command.
-                    print(PROMPT, end="")
+                    print_prompt()
                 self.command_buffer = ""
             else:
                 print(next_char, end="")
