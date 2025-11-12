@@ -1,4 +1,4 @@
-This folder contains the software for on LEGO Hubs with Pybricks.
+This folder contains the software for LEGO Hubs with Pybricks.
 
 Libraries:
 ==========
@@ -32,11 +32,29 @@ from stdin.
 pylib_motor_calibration.py
 --------------------------
 
-Provides a caliration task (motor in zero position) and a de-calibration task
+Provides a calibation task (motor in zero position) and a de-calibration task
 (motor runs for 2 seconds).
+
+pylib_railroad_switch.py
+------------------------
+
+Provides a control task for motors that are driving railroad switches.
 
 Programs:
 =========
+
+
+Pybricks_railroad_switches.py
+-----------------------------
+
+Controls the motors for 4 railroad switches. The tasks are running in
+foreground and are blocking the console prompt.
+
+Pybricks_railroad_switches_bg.py
+--------------------------------
+
+Controls the motors for 4 railroad switches. The tasks are running in
+background without blocking the console prompt.
 
 Pybricks_simulation.py
 -----------------------
