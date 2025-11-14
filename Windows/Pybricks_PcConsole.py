@@ -14,18 +14,54 @@ HUB_NAMES = ["Technic Hub 1"]
 PROMPT = b">>> "
 PROMPT_LEN = len(PROMPT)
 
-F1_COMMMAND = b"F1_"
-F2_COMMMAND = b"F2_"
-F3_COMMMAND = b"F3_"
-F4_COMMMAND = b"F4_"
-F5_COMMMAND = b"F5_"
-F6_COMMMAND = b"F6_"
-F7_COMMMAND = b"F7_"
-F8_COMMMAND = b"F8_"
-F9_COMMMAND = b"F9_"
-F10_COMMMAND = b"F10"
-F11_COMMMAND = b"F11"
-F12_COMMMAND = b"F12"
+F1_LABEL = "A 1"
+F2_LABEL = "A 2"
+F3_LABEL = "A 3"
+F4_LABEL = "A 4"
+F5_LABEL = "B 1"
+F6_LABEL = "B 2"
+F7_LABEL = "B 3"
+F8_LABEL = "B 4"
+F9_LABEL = "F9_"
+F10_LABEL = "F10"
+F11_LABEL = "F11"
+F12_LABEL = "F12"
+F1_COLOR = QColorConstants.DarkCyan
+F2_COLOR = QColorConstants.DarkMagenta
+F3_COLOR = QColorConstants.DarkMagenta
+F4_COLOR = QColorConstants.DarkCyan
+F5_COLOR = QColorConstants.DarkCyan
+F6_COLOR = QColorConstants.DarkMagenta
+F7_COLOR = QColorConstants.DarkMagenta
+F8_COLOR = QColorConstants.DarkCyan
+F9_COLOR = QColorConstants.White
+F10_COLOR = QColorConstants.White
+F11_COLOR = QColorConstants.White
+F12_COLOR = QColorConstants.White
+F1_TEXT_COLOR = QColorConstants.White
+F2_TEXT_COLOR = QColorConstants.White
+F3_TEXT_COLOR = QColorConstants.White
+F4_TEXT_COLOR = QColorConstants.White
+F5_TEXT_COLOR = QColorConstants.White
+F6_TEXT_COLOR = QColorConstants.White
+F7_TEXT_COLOR = QColorConstants.White
+F8_TEXT_COLOR = QColorConstants.White
+F9_TEXT_COLOR = QColorConstants.Black
+F10_TEXT_COLOR = QColorConstants.Black
+F11_TEXT_COLOR = QColorConstants.Black
+F12_TEXT_COLOR = QColorConstants.Black
+F1_COMMMAND = b"A 1"
+F2_COMMMAND = b"A 2"
+F3_COMMMAND = b"A 3"
+F4_COMMMAND = b"A 4"
+F5_COMMMAND = b"B 1"
+F6_COMMMAND = b"B 2"
+F7_COMMMAND = b"B 3"
+F8_COMMMAND = b"B 4"
+F9_COMMMAND = b""
+F10_COMMMAND = b""
+F11_COMMMAND = b""
+F12_COMMMAND = b""
 BUTTON_LEFT_PLUS_COMMAND = b"L_U"
 BUTTON_LEFT_COMMAND = b"L__"
 BUTTON_LEFT_MINUS_COMMAND = b"L_D"
@@ -57,6 +93,9 @@ def set_button_color(button, color):
     pal.setColor(QPalette.Button, color)
     button.setPalette(pal)
     button.update()
+
+def set_button_text_color(button, color):
+    button.setStyleSheet("QPushButton {color: " + color.name() + ";}")
 
 # Encapsulates the ble client to remote control a hub.
 class HubClient:
@@ -129,75 +168,99 @@ class RemoteConsole(QDialog):
         self.top_frame.setLayout(self.top_layout)
         # view - left buttons frame
         self.left_buttons_frame = QFrame()
-        self.button_f1 = QPushButton("F1")
+        self.button_f1 = QPushButton(F1_LABEL)
         self.button_f1.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f1.setAutoDefault(False)
+        set_button_color(self.button_f1, F1_COLOR)
+        set_button_text_color(self.button_f1, F1_TEXT_COLOR)
         self.button_f1.clicked.connect(self.button_f1_clicked)
         self.input_f1 = QLineEdit()
         self.input_f1.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f2 = QPushButton("F2")
+        self.button_f2 = QPushButton(F2_LABEL)
         self.button_f2.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f2.setAutoDefault(False)
+        set_button_color(self.button_f2, F2_COLOR)
+        set_button_text_color(self.button_f2, F2_TEXT_COLOR)
         self.button_f2.clicked.connect(self.button_f2_clicked)
         self.input_f2 = QLineEdit()
         self.input_f2.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f3 = QPushButton("F3")
+        self.button_f3 = QPushButton(F3_LABEL)
         self.button_f3.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f3.setAutoDefault(False)
+        set_button_color(self.button_f3, F3_COLOR)
+        set_button_text_color(self.button_f3, F3_TEXT_COLOR)
         self.button_f3.clicked.connect(self.button_f3_clicked)
         self.input_f3 = QLineEdit()
         self.input_f3.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f4 = QPushButton("F4")
+        self.button_f4 = QPushButton(F4_LABEL)
         self.button_f4.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f4.setAutoDefault(False)
+        set_button_color(self.button_f4, F4_COLOR)
+        set_button_text_color(self.button_f4, F4_TEXT_COLOR)
         self.button_f4.clicked.connect(self.button_f4_clicked)
         self.input_f4 = QLineEdit()
         self.input_f4.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f5 = QPushButton("F5")
+        self.button_f5 = QPushButton(F5_LABEL)
         self.button_f5.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f5.setAutoDefault(False)
+        set_button_color(self.button_f5, F5_COLOR)
+        set_button_text_color(self.button_f5, F5_TEXT_COLOR)
         self.button_f5.clicked.connect(self.button_f5_clicked)
         self.input_f5 = QLineEdit()
         self.input_f5.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f6 = QPushButton("F6")
+        self.button_f6 = QPushButton(F6_LABEL)
         self.button_f6.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f6.setAutoDefault(False)
+        set_button_color(self.button_f6, F6_COLOR)
+        set_button_text_color(self.button_f6, F6_TEXT_COLOR)
         self.button_f6.clicked.connect(self.button_f6_clicked)
         self.input_f6 = QLineEdit()
         self.input_f6.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f7 = QPushButton("F7")
+        self.button_f7 = QPushButton(F7_LABEL)
         self.button_f7.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f7.setAutoDefault(False)
+        set_button_color(self.button_f7, F7_COLOR)
+        set_button_text_color(self.button_f7, F7_TEXT_COLOR)
         self.button_f7.clicked.connect(self.button_f7_clicked)
         self.input_f7 = QLineEdit()
         self.input_f7.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f8 = QPushButton("F8")
+        self.button_f8 = QPushButton(F8_LABEL)
         self.button_f8.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f8.setAutoDefault(False)
+        set_button_color(self.button_f8, F8_COLOR)
+        set_button_text_color(self.button_f8, F8_TEXT_COLOR)
         self.button_f8.clicked.connect(self.button_f8_clicked)
         self.input_f8 = QLineEdit()
         self.input_f8.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f9 = QPushButton("F9")
+        self.button_f9 = QPushButton(F9_LABEL)
         self.button_f9.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f9.setAutoDefault(False)
+        set_button_color(self.button_f9, F9_COLOR)
+        set_button_text_color(self.button_f9, F9_TEXT_COLOR)
         self.button_f9.clicked.connect(self.button_f9_clicked)
         self.input_f9 = QLineEdit()
         self.input_f9.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f10 = QPushButton("F10")
+        self.button_f10 = QPushButton(F10_LABEL)
         self.button_f10.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f10.setAutoDefault(False)
+        set_button_color(self.button_f10, F10_COLOR)
+        set_button_text_color(self.button_f10, F10_TEXT_COLOR)
         self.button_f10.clicked.connect(self.button_f10_clicked)
         self.input_f10 = QLineEdit()
         self.input_f10.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f11 = QPushButton("F11")
+        self.button_f11 = QPushButton(F11_LABEL)
         self.button_f11.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f11.setAutoDefault(False)
+        set_button_color(self.button_f11, F11_COLOR)
+        set_button_text_color(self.button_f11, F11_TEXT_COLOR)
         self.button_f11.clicked.connect(self.button_f11_clicked)
         self.input_f11 = QLineEdit()
         self.input_f11.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f12 = QPushButton("F12")
+        self.button_f12 = QPushButton(F12_LABEL)
         self.button_f12.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f12.setAutoDefault(False)
+        set_button_color(self.button_f12, F12_COLOR)
+        set_button_text_color(self.button_f12, F12_TEXT_COLOR)
         self.button_f12.clicked.connect(self.button_f12_clicked)
         self.input_f12 = QLineEdit()
         self.input_f12.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
