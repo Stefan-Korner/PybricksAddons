@@ -1,0 +1,98 @@
+[
+	{
+		"hubName": "Technic Hub 1",
+		"f1": {
+			"label": "A 1",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "A 1"
+		},
+		"f2": {
+			"label": "A 2",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "A 2"
+		},
+		"f3": {
+			"label": "A 3",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "A 3"
+		},
+		"f4": {
+			"label": "A 4",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "A 4"
+		},
+		"f5": {
+			"label": "B 1",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "B 1"
+		},
+		"f6": {
+			"label": "B 2",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "B 2"
+		},
+		"f7": {
+			"label": "B 3",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "B 3"
+		},
+		"f8": {
+			"label": "B 4",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "B 4"
+		},
+		"f9": {
+			"label": "F9_",
+			"color": "White",
+			"textColor": "Black",
+			"command": ""
+		},
+		"f10": {
+			"label": "F10",
+			"color": "White",
+			"textColor": "Black",
+			"command": ""
+		},
+		"f11": {
+			"label": "F11",
+			"color": "White",
+			"textColor": "Black",
+			"command": ""
+		},
+		"f12": {
+			"label": "F12",
+			"color": "White",
+			"textColor": "Black",
+			"command": ""
+		},
+		"leftPlus": {
+			"command": "L_U"
+		},
+		"left": {
+			"command": "L__"
+		},
+		"leftMinus": {
+			"command": "L_D"
+		},
+		"middle": {
+			"command": "M__"
+		},
+		"rightPlus": {
+			"command": "R_U"
+		},
+		"right": {
+			"command": "R__"
+		},
+		"RightMinus": {
+			"command": "R_D"
+		}
+	}
+]

@@ -1,4 +1,4 @@
-import asyncio, sys
+import asyncio, json, sys
 from bleak import BleakScanner, BleakClient
 import PySide6.QtAsyncio as QtAsyncio
 from PySide6.QtGui import (QColor, QColorConstants, QPalette, QTextCursor)
@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout,
                                QLabel, QLineEdit, QPlainTextEdit, QPushButton)
 from PySide6.QtCore import QSize, Slot
 
+CONFIG_FILE_NAME = "Pybricks_PcConsole.json"
 PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
 # Name of the hubs when installing the Pybricks firmware.
 HUB_NAMES = ["Technic Hub 1"]
@@ -14,42 +15,6 @@ HUB_NAMES = ["Technic Hub 1"]
 PROMPT = b">>> "
 PROMPT_LEN = len(PROMPT)
 
-F1_LABEL = "A 1"
-F2_LABEL = "A 2"
-F3_LABEL = "A 3"
-F4_LABEL = "A 4"
-F5_LABEL = "B 1"
-F6_LABEL = "B 2"
-F7_LABEL = "B 3"
-F8_LABEL = "B 4"
-F9_LABEL = "F9_"
-F10_LABEL = "F10"
-F11_LABEL = "F11"
-F12_LABEL = "F12"
-F1_COLOR = QColorConstants.DarkCyan
-F2_COLOR = QColorConstants.DarkMagenta
-F3_COLOR = QColorConstants.DarkMagenta
-F4_COLOR = QColorConstants.DarkCyan
-F5_COLOR = QColorConstants.DarkCyan
-F6_COLOR = QColorConstants.DarkMagenta
-F7_COLOR = QColorConstants.DarkMagenta
-F8_COLOR = QColorConstants.DarkCyan
-F9_COLOR = QColorConstants.White
-F10_COLOR = QColorConstants.White
-F11_COLOR = QColorConstants.White
-F12_COLOR = QColorConstants.White
-F1_TEXT_COLOR = QColorConstants.White
-F2_TEXT_COLOR = QColorConstants.White
-F3_TEXT_COLOR = QColorConstants.White
-F4_TEXT_COLOR = QColorConstants.White
-F5_TEXT_COLOR = QColorConstants.White
-F6_TEXT_COLOR = QColorConstants.White
-F7_TEXT_COLOR = QColorConstants.White
-F8_TEXT_COLOR = QColorConstants.White
-F9_TEXT_COLOR = QColorConstants.Black
-F10_TEXT_COLOR = QColorConstants.Black
-F11_TEXT_COLOR = QColorConstants.Black
-F12_TEXT_COLOR = QColorConstants.Black
 F1_COMMMAND = b"A 1"
 F2_COMMMAND = b"A 2"
 F3_COMMMAND = b"A 3"
@@ -82,19 +47,23 @@ HUB_CONNECTED = 3
 HUB_RUNNING = 4
 HUB_DISCONNECTING = 5
 
-def set_label_color(label, color):
+def set_label_color(label, color_name):
+    color = getattr(QColorConstants, color_name)
     pal = label.palette()
     pal.setColor(QPalette.Window, color)
     label.setPalette(pal)
     label.update()
 
-def set_button_color(button, color):
+def set_button_color(button, color_name):
+    color = getattr(QColorConstants, color_name)
     pal = button.palette()
     pal.setColor(QPalette.Button, color)
     button.setPalette(pal)
     button.update()
 
-def set_button_text_color(button, color):
+def set_button_text_color(button, color_name):
+    color = getattr(QColorConstants, color_name)
+    # color.name() returns the RGB value
     button.setStyleSheet("QPushButton {color: " + color.name() + ";}")
 
 # Encapsulates the ble client to remote control a hub.
@@ -148,14 +117,21 @@ class HubClient:
         self.send_is_ready = False
 
 class RemoteConsole(QDialog):
-    def __init__(self, hub_name):
+    def __init__(self, console_config_dict):
         super().__init__()
+        # model
+        ObjFromDict = type("ObjFromDict", (object,), console_config_dict)
+        self.console_config = ObjFromDict()
+        self.hub_connect_state = HUB_DISCONNECTED
+        self.device = None
+        self.client = None
+        self.hub_client = None
         # view - top frame
         self.top_frame = QFrame()
-        self.label_hub_name = QLabel(hub_name)
+        self.label_hub_name = QLabel(self.console_config.hubName)
         self.label_connect = QLabel("disconnected")
         self.label_connect.setAutoFillBackground(True)
-        set_label_color(self.label_connect, QColorConstants.Gray)
+        set_label_color(self.label_connect, "Gray")
         self.button_connect = QPushButton("connect to hub")
         self.button_connect.setAutoDefault(False)
         self.button_connect.clicked.connect(self.button_connect_clicked)
@@ -168,99 +144,99 @@ class RemoteConsole(QDialog):
         self.top_frame.setLayout(self.top_layout)
         # view - left buttons frame
         self.left_buttons_frame = QFrame()
-        self.button_f1 = QPushButton(F1_LABEL)
+        self.button_f1 = QPushButton(self.console_config.f1["label"])
         self.button_f1.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f1.setAutoDefault(False)
-        set_button_color(self.button_f1, F1_COLOR)
-        set_button_text_color(self.button_f1, F1_TEXT_COLOR)
+        set_button_color(self.button_f1, self.console_config.f1["color"])
+        set_button_text_color(self.button_f1, self.console_config.f1["textColor"])
         self.button_f1.clicked.connect(self.button_f1_clicked)
         self.input_f1 = QLineEdit()
         self.input_f1.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f2 = QPushButton(F2_LABEL)
+        self.button_f2 = QPushButton(self.console_config.f2["label"])
         self.button_f2.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f2.setAutoDefault(False)
-        set_button_color(self.button_f2, F2_COLOR)
-        set_button_text_color(self.button_f2, F2_TEXT_COLOR)
+        set_button_color(self.button_f2, self.console_config.f2["color"])
+        set_button_text_color(self.button_f2, self.console_config.f2["textColor"])
         self.button_f2.clicked.connect(self.button_f2_clicked)
         self.input_f2 = QLineEdit()
         self.input_f2.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f3 = QPushButton(F3_LABEL)
+        self.button_f3 = QPushButton(self.console_config.f3["label"])
         self.button_f3.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f3.setAutoDefault(False)
-        set_button_color(self.button_f3, F3_COLOR)
-        set_button_text_color(self.button_f3, F3_TEXT_COLOR)
+        set_button_color(self.button_f3, self.console_config.f3["color"])
+        set_button_text_color(self.button_f3, self.console_config.f3["textColor"])
         self.button_f3.clicked.connect(self.button_f3_clicked)
         self.input_f3 = QLineEdit()
         self.input_f3.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f4 = QPushButton(F4_LABEL)
+        self.button_f4 = QPushButton(self.console_config.f4["label"])
         self.button_f4.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f4.setAutoDefault(False)
-        set_button_color(self.button_f4, F4_COLOR)
-        set_button_text_color(self.button_f4, F4_TEXT_COLOR)
+        set_button_color(self.button_f4, self.console_config.f4["color"])
+        set_button_text_color(self.button_f4, self.console_config.f4["textColor"])
         self.button_f4.clicked.connect(self.button_f4_clicked)
         self.input_f4 = QLineEdit()
         self.input_f4.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f5 = QPushButton(F5_LABEL)
+        self.button_f5 = QPushButton(self.console_config.f5["label"])
         self.button_f5.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f5.setAutoDefault(False)
-        set_button_color(self.button_f5, F5_COLOR)
-        set_button_text_color(self.button_f5, F5_TEXT_COLOR)
+        set_button_color(self.button_f5, self.console_config.f5["color"])
+        set_button_text_color(self.button_f5, self.console_config.f5["textColor"])
         self.button_f5.clicked.connect(self.button_f5_clicked)
         self.input_f5 = QLineEdit()
         self.input_f5.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f6 = QPushButton(F6_LABEL)
+        self.button_f6 = QPushButton(self.console_config.f6["label"])
         self.button_f6.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f6.setAutoDefault(False)
-        set_button_color(self.button_f6, F6_COLOR)
-        set_button_text_color(self.button_f6, F6_TEXT_COLOR)
+        set_button_color(self.button_f6, self.console_config.f6["color"])
+        set_button_text_color(self.button_f6, self.console_config.f6["textColor"])
         self.button_f6.clicked.connect(self.button_f6_clicked)
         self.input_f6 = QLineEdit()
         self.input_f6.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f7 = QPushButton(F7_LABEL)
+        self.button_f7 = QPushButton(self.console_config.f7["label"])
         self.button_f7.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f7.setAutoDefault(False)
-        set_button_color(self.button_f7, F7_COLOR)
-        set_button_text_color(self.button_f7, F7_TEXT_COLOR)
+        set_button_color(self.button_f7, self.console_config.f7["color"])
+        set_button_text_color(self.button_f7, self.console_config.f7["textColor"])
         self.button_f7.clicked.connect(self.button_f7_clicked)
         self.input_f7 = QLineEdit()
         self.input_f7.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f8 = QPushButton(F8_LABEL)
+        self.button_f8 = QPushButton(self.console_config.f8["label"])
         self.button_f8.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f8.setAutoDefault(False)
-        set_button_color(self.button_f8, F8_COLOR)
-        set_button_text_color(self.button_f8, F8_TEXT_COLOR)
+        set_button_color(self.button_f8, self.console_config.f8["color"])
+        set_button_text_color(self.button_f8, self.console_config.f8["textColor"])
         self.button_f8.clicked.connect(self.button_f8_clicked)
         self.input_f8 = QLineEdit()
         self.input_f8.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f9 = QPushButton(F9_LABEL)
+        self.button_f9 = QPushButton(self.console_config.f9["label"])
         self.button_f9.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f9.setAutoDefault(False)
-        set_button_color(self.button_f9, F9_COLOR)
-        set_button_text_color(self.button_f9, F9_TEXT_COLOR)
+        set_button_color(self.button_f9, self.console_config.f9["color"])
+        set_button_text_color(self.button_f9, self.console_config.f9["textColor"])
         self.button_f9.clicked.connect(self.button_f9_clicked)
         self.input_f9 = QLineEdit()
         self.input_f9.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f10 = QPushButton(F10_LABEL)
+        self.button_f10 = QPushButton(self.console_config.f10["label"])
         self.button_f10.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f10.setAutoDefault(False)
-        set_button_color(self.button_f10, F10_COLOR)
-        set_button_text_color(self.button_f10, F10_TEXT_COLOR)
+        set_button_color(self.button_f10, self.console_config.f10["color"])
+        set_button_text_color(self.button_f10, self.console_config.f10["textColor"])
         self.button_f10.clicked.connect(self.button_f10_clicked)
         self.input_f10 = QLineEdit()
         self.input_f10.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f11 = QPushButton(F11_LABEL)
+        self.button_f11 = QPushButton(self.console_config.f11["label"])
         self.button_f11.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f11.setAutoDefault(False)
-        set_button_color(self.button_f11, F11_COLOR)
-        set_button_text_color(self.button_f11, F11_TEXT_COLOR)
+        set_button_color(self.button_f11, self.console_config.f11["color"])
+        set_button_text_color(self.button_f11, self.console_config.f11["textColor"])
         self.button_f11.clicked.connect(self.button_f11_clicked)
         self.input_f11 = QLineEdit()
         self.input_f11.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
-        self.button_f12 = QPushButton(F12_LABEL)
+        self.button_f12 = QPushButton(self.console_config.f12["label"])
         self.button_f12.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_f12.setAutoDefault(False)
-        set_button_color(self.button_f12, F12_COLOR)
-        set_button_text_color(self.button_f12, F12_TEXT_COLOR)
+        set_button_color(self.button_f12, self.console_config.f12["color"])
+        set_button_text_color(self.button_f12, self.console_config.f12["textColor"])
         self.button_f12.clicked.connect(self.button_f12_clicked)
         self.input_f12 = QLineEdit()
         self.input_f12.setFixedSize(QSize(INPUT_WIDTH, INPUT_HEIGTH))
@@ -301,7 +277,7 @@ class RemoteConsole(QDialog):
         self.button_left = QPushButton("L")
         self.button_left.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_left.setAutoDefault(False)
-        set_button_color(self.button_left, QColorConstants.Red)
+        set_button_color(self.button_left, "Red")
         self.button_left.clicked.connect(self.button_left_clicked)
         self.button_left_minus = QPushButton("-")
         self.button_left_minus.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
@@ -310,7 +286,7 @@ class RemoteConsole(QDialog):
         self.button_middle = QPushButton("M")
         self.button_middle.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_middle.setAutoDefault(False)
-        set_button_color(self.button_middle, QColorConstants.Green)
+        set_button_color(self.button_middle, "Green")
         self.button_middle.clicked.connect(self.button_middle_clicked)
         self.button_right_plus = QPushButton("+")
         self.button_right_plus.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
@@ -319,7 +295,7 @@ class RemoteConsole(QDialog):
         self.button_right = QPushButton("R")
         self.button_right.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
         self.button_right.setAutoDefault(False)
-        set_button_color(self.button_right, QColorConstants.Red)
+        set_button_color(self.button_right, "Red")
         self.button_right.clicked.connect(self.button_right_clicked)
         self.button_right_minus = QPushButton("-")
         self.button_right_minus.setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGTH))
@@ -354,12 +330,6 @@ class RemoteConsole(QDialog):
         self.layout.addWidget(self.right_buttons_frame, 1, 1, 1, 1)
         self.layout.addWidget(self.bottom_frame, 2, 0, 1, 2)
         self.setLayout(self.layout)
-        # model
-        self.hub_name = hub_name
-        self.hub_connect_state = HUB_DISCONNECTED
-        self.device = None
-        self.client = None
-        self.hub_client = None
 
     # Logs text to the logger.
     def log_text(self, text, end="\n"):
@@ -369,7 +339,7 @@ class RemoteConsole(QDialog):
     async def start_hub(self):
         self.button_connect.setText("Click when hub is started")
         self.label_connect.setText("Start hub with hub button")
-        set_label_color(self.label_connect, QColorConstants.Cyan)
+        set_label_color(self.label_connect, "Cyan")
         self.hub_connect_state = HUB_REQUEST_ON
 
     async def connect_hub(self):
@@ -377,19 +347,20 @@ class RemoteConsole(QDialog):
         self.log_text("pc> Hub is started")
         self.button_connect.setText("")
         self.label_connect.setText("Scan to find the hub")
-        set_label_color(self.label_connect, QColorConstants.Magenta)
+        set_label_color(self.label_connect, "Magenta")
 
         # Do a Bluetooth scan to find the hub.
-        device = await BleakScanner.find_device_by_name(self.hub_name)
+        hub_name = self.console_config.hubName
+        device = await BleakScanner.find_device_by_name(hub_name)
         if device is None:
             self.hub_connect_state = HUB_DISCONNECTED
-            self.log_text(f"pc> Could not find hub with name: {self.hub_name}")
+            self.log_text(f"pc> Could not find hub with name: {hub_name}")
             self.button_connect.setText("connect to hub")
             self.label_connect.setText("disconnected")
-            set_label_color(self.label_connect, QColorConstants.Gray)
+            set_label_color(self.label_connect, "Gray")
             return
         # Hub found.
-        self.log_text(f"pc> Hub found with name: {self.hub_name}")
+        self.log_text(f"pc> Hub found with name: {hub_name}")
 
         # Connect to the hub.
         self.client = BleakClient(device)
@@ -406,7 +377,7 @@ class RemoteConsole(QDialog):
         self.log_text("pc> Hub notifications started")
         # Tell user to start program on the hub.
         self.label_connect.setText("Start program with hub button")
-        set_label_color(self.label_connect, QColorConstants.Yellow)
+        set_label_color(self.label_connect, "Yellow")
 
         # Waits until a ready response has been sent from the hub.
         await self.hub_client.wait_send_ready()
@@ -414,25 +385,26 @@ class RemoteConsole(QDialog):
         self.log_text("pc> Hub running.")
         self.button_connect.setText("disconnect from hub")
         self.label_connect.setText("running")
-        set_label_color(self.label_connect, QColorConstants.Green)
+        set_label_color(self.label_connect, "Green")
 
     async def disconnect_hub(self):
         self.hub_connect_state = HUB_DISCONNECTING
-        set_label_color(self.label_connect, QColorConstants.Yellow)
+        set_label_color(self.label_connect, "Yellow")
         self.button_connect.setText("")
         for i in range(3):
             self.label_connect.setText("disconnecting" + ("." * i))
             await asyncio.sleep(1)
         self.hub_connect_state = HUB_DISCONNECTED
         self.label_connect.setText("disconnected")
-        set_label_color(self.label_connect, QColorConstants.Gray)
+        set_label_color(self.label_connect, "Gray")
         self.button_connect.setText("connect to hub")
 
-    def hub_is_running(self):
-        if self.hub_connect_state == HUB_RUNNING:
-            return True
-        self.log_text("pc> error: not connected to hub")
-        return False
+    def create_send_task(self, command):
+        if self.hub_connect_state != HUB_RUNNING:
+            self.log_text("pc> error: not connected to hub")
+            return
+        binary_command = command.encode("ascii")
+        asyncio.create_task(self.hub_client.send(binary_command))
 
     @Slot()
     def button_connect_clicked(self):
@@ -445,98 +417,79 @@ class RemoteConsole(QDialog):
 
     @Slot()
     def button_f1_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F1_COMMMAND))
+        self.create_send_task(self.console_config.f1["command"])
 
     @Slot()
     def button_f2_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F2_COMMMAND))
+        self.create_send_task(self.console_config.f2["command"])
 
     @Slot()
     def button_f3_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F3_COMMMAND))
+        self.create_send_task(self.console_config.f3["command"])
 
     @Slot()
     def button_f4_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F4_COMMMAND))
+        self.create_send_task(self.console_config.f4["command"])
 
     @Slot()
     def button_f5_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F5_COMMMAND))
+        self.create_send_task(self.console_config.f5["command"])
 
     @Slot()
     def button_f6_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F6_COMMMAND))
+        self.create_send_task(self.console_config.f6["command"])
 
     @Slot()
     def button_f7_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F7_COMMMAND))
+        self.create_send_task(self.console_config.f7["command"])
 
     @Slot()
     def button_f8_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F8_COMMMAND))
+        self.create_send_task(self.console_config.f8["command"])
 
     @Slot()
     def button_f9_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F9_COMMMAND))
+        self.create_send_task(self.console_config.f9["command"])
 
     @Slot()
     def button_f10_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F10_COMMMAND))
+        self.create_send_task(self.console_config.f10["command"])
 
     @Slot()
     def button_f11_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F11_COMMMAND))
+        self.create_send_task(self.console_config.f11["command"])
 
     @Slot()
     def button_f12_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(F12_COMMMAND))
+        self.create_send_task(self.console_config.f12["command"])
 
     @Slot()
     def button_left_plus_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_LEFT_PLUS_COMMAND))
+        self.create_send_task(self.console_config.leftPlus["command"])
 
     @Slot()
     def button_left_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_LEFT_COMMAND))
+        self.create_send_task(self.console_config.left["command"])
 
     @Slot()
     def button_left_minus_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_LEFT_MINUS_COMMAND))
+        self.create_send_task(self.console_config.leftMinus["command"])
 
     @Slot()
     def button_middle_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_MIDDLE_COMMAND))
+        self.create_send_task(self.console_config.middle["command"])
 
     @Slot()
     def button_right_plus_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_RIGHT_PLUS_COMMAND))
+        self.create_send_task(self.console_config.rightPlus["command"])
 
     @Slot()
     def button_right_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_RIGHT_COMMAND))
+        self.create_send_task(self.console_config.right["command"])
 
     @Slot()
     def button_right_minus_clicked(self):
-        if self.hub_is_running():
-            asyncio.create_task(self.hub_client.send(BUTTON_RIGHT_MINUS_COMMAND))
+        self.create_send_task(self.console_config.rightMinus["command"])
 
     @Slot()
     def line_input_return_pressed(self):
@@ -546,13 +499,20 @@ class RemoteConsole(QDialog):
 
 # Run the main async program.
 if __name__ == "__main__":
-    # Start the RemoteConsole
-    app = QApplication(sys.argv)
-    # remote consoles must be saved in the global list,
-    # otherwiese garbage collector
-    remote_consoles = []
-    for hub_name in HUB_NAMES:
-        remote_console = RemoteConsole(hub_name)
-        remote_console.show()
-        remote_consoles.append(remote_console)
-    QtAsyncio.run(handle_sigint=True)
+    # Read the configuration JSON file
+    try:
+        with open(CONFIG_FILE_NAME, "r") as f:
+            config = json.load(f)
+    except Exception as e:
+        print(f"Cannot read configuration file: {e}")
+    else:
+        # Start the RemoteConsole
+        app = QApplication(sys.argv)
+        # Remote consoles must be saved in the global list,
+        # otherwiese the garbage collector deletes it
+        remote_consoles = []
+        for console_config_dict in config:
+            remote_console = RemoteConsole(console_config_dict)
+            remote_console.show()
+            remote_consoles.append(remote_console)
+        QtAsyncio.run(handle_sigint=True)
