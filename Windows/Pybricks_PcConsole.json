@@ -50,16 +50,16 @@
 			"command": "B 4"
 		},
 		"f9": {
-			"label": "F9_",
-			"color": "White",
-			"textColor": "Black",
-			"command": ""
+			"label": "A",
+			"color": "Blue",
+			"textColor": "White",
+			"command": "A"
 		},
 		"f10": {
-			"label": "F10",
-			"color": "White",
-			"textColor": "Black",
-			"command": ""
+			"label": "B",
+			"color": "Blue",
+			"textColor": "White",
+			"command": "B"
 		},
 		"f11": {
 			"label": "F11",

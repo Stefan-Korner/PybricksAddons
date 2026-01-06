@@ -379,10 +379,12 @@ class RemoteConsole(QDialog):
         set_label_color(self.label_connect, "Gray")
         self.button_connect.setText("connect to hub")
 
-    def create_send_task(self, command):
+    def create_send_task(self, command, arg=""):
         if self.hub_connect_state != HUB_RUNNING:
             self.log_text("pc> error: not connected to hub")
             return
+        if len(arg) > 0:
+            command += " " + arg
         binary_command = command.encode("ascii")
         asyncio.create_task(self.hub_client.send(binary_command))
 
@@ -397,51 +399,63 @@ class RemoteConsole(QDialog):
 
     @Slot()
     def button_f1_clicked(self):
-        self.create_send_task(self.console_config.f1["command"])
+        text = self.input_f1.text()
+        self.create_send_task(self.console_config.f1["command"], text)
 
     @Slot()
     def button_f2_clicked(self):
-        self.create_send_task(self.console_config.f2["command"])
+        text = self.input_f2.text()
+        self.create_send_task(self.console_config.f2["command"], text)
 
     @Slot()
     def button_f3_clicked(self):
-        self.create_send_task(self.console_config.f3["command"])
+        text = self.input_f3.text()
+        self.create_send_task(self.console_config.f3["command"], text)
 
     @Slot()
     def button_f4_clicked(self):
-        self.create_send_task(self.console_config.f4["command"])
+        text = self.input_f4.text()
+        self.create_send_task(self.console_config.f4["command"], text)
 
     @Slot()
     def button_f5_clicked(self):
-        self.create_send_task(self.console_config.f5["command"])
+        text = self.input_f5.text()
+        self.create_send_task(self.console_config.f5["command"], text)
 
     @Slot()
     def button_f6_clicked(self):
-        self.create_send_task(self.console_config.f6["command"])
+        text = self.input_f6.text()
+        self.create_send_task(self.console_config.f6["command"], text)
 
     @Slot()
     def button_f7_clicked(self):
-        self.create_send_task(self.console_config.f7["command"])
+        text = self.input_f7.text()
+        self.create_send_task(self.console_config.f7["command"], text)
 
     @Slot()
     def button_f8_clicked(self):
-        self.create_send_task(self.console_config.f8["command"])
+        text = self.input_f8.text()
+        self.create_send_task(self.console_config.f8["command"], text)
 
     @Slot()
     def button_f9_clicked(self):
-        self.create_send_task(self.console_config.f9["command"])
+        text = self.input_f9.text()
+        self.create_send_task(self.console_config.f9["command"], text)
 
     @Slot()
     def button_f10_clicked(self):
-        self.create_send_task(self.console_config.f10["command"])
+        text = self.input_f10.text()
+        self.create_send_task(self.console_config.f10["command"], text)
 
     @Slot()
     def button_f11_clicked(self):
-        self.create_send_task(self.console_config.f11["command"])
+        text = self.input_f11.text()
+        self.create_send_task(self.console_config.f11["command"], text)
 
     @Slot()
     def button_f12_clicked(self):
-        self.create_send_task(self.console_config.f12["command"])
+        text = self.input_f12.text()
+        self.create_send_task(self.console_config.f12["command"], text)
 
     @Slot()
     def button_left_plus_clicked(self):
