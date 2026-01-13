@@ -1,7 +1,7 @@
 import asyncio, json, sys
 from bleak import BleakScanner, BleakClient
 import PySide6.QtAsyncio as QtAsyncio
-from PySide6.QtGui import (QColor, QColorConstants, QPalette, QTextCursor)
+from PySide6.QtGui import (QColor, QColorConstants, QFont, QPalette, QTextCursor)
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout,
                                QLabel, QLineEdit, QPlainTextEdit, QPushButton)
 from PySide6.QtCore import QSize, Slot
@@ -12,7 +12,7 @@ PYBRICKS_COMMAND_EVENT_CHAR_UUID = "c5f50002-8280-46da-89f4-6d8051e4aeef"
 HUB_NAMES = ["Technic Hub 1"]
 #HUB_NAMES = ["Technic Hub 1", "Technic Hub 2"]
 # Prompt to inform the PC that a new command can be processed.
-PROMPT = b">>> "
+PROMPT = ">>> "
 PROMPT_LEN = len(PROMPT)
 
 BUTTON_WIDTH = 60
@@ -49,28 +49,41 @@ def set_button_text_color(button, color_name):
 # Encapsulates the ble client to remote control a hub.
 class HubClient:
 
-    def __init__(self, ble_client, event_char_uuid, logger=None):
+    def __init__(self, ble_client, event_char_uuid, hub_logger):
         self.ble_client = ble_client
         self.ready_event = asyncio.Event()
         self.event_char_uuid = event_char_uuid
-        self.logger = logger
+        self.hub_logger = hub_logger
         self.send_is_ready = False
-
-    # Logs text to a logger if a logger is used.
-    def log_text(self, text, end="\n"):
-        if self.logger:
-            self.logger.log_text(text, end)
+        self.response_buffer = ""
 
     # Callback for receiving data.
     def handle_rx(self, _, data: bytearray):
         # "write stdout" event (0x01)
         if data[0] == 0x01:
-            payload = data[1:]
-            self.log_text(payload.decode("utf-8"), end="")
+            payload = data[1:].decode("utf-8")
+            self.handle_next_payload(payload)
             if len(payload) >= PROMPT_LEN:
                 if payload[-PROMPT_LEN:] == PROMPT:
-                    self.log_text("")
                     self.ready_event.set()
+
+    # Callback for receiving next payload characters.
+    def handle_next_payload(self, payload):
+        for next_char in payload:
+            if next_char == "\r":
+                # ignore the return before the newline
+                pass
+            elif next_char == "\n":
+                self.handle_response_line(self.response_buffer)
+                self.hub_logger.log_hub("")
+                self.response_buffer = ""
+            else:
+                self.hub_logger.log_hub(next_char, end="")
+                self.response_buffer += next_char
+
+    # Callback for receiving a complete response line.
+    def handle_response_line(self, response_line):
+        pass
 
     # Subscribe to notifications from the hub.
     async def start_notify(self):
@@ -294,14 +307,22 @@ class RemoteConsole(QDialog):
         self.right_buttons_frame.setLayout(self.right_buttons_layout)
         # view - bottom frame
         self.bottom_frame = QFrame()
-        self.line_input = QLineEdit()
-        self.line_input.returnPressed.connect(self.line_input_return_pressed)
-        self.text_log = QPlainTextEdit()
+        self.label_local = QLabel("local")
+        self.local_log = QPlainTextEdit()
+        self.label_hub = QLabel("hub")
+        self.hub_log = QPlainTextEdit()
+        self.command_input = QLineEdit()
+        self.command_input.returnPressed.connect(self.command_input_return_pressed)
+        courier_font = QFont("Courier")
+        self.hub_log.setFont(courier_font)
         self.bottom_frame.setFrameShadow(QFrame.Sunken)
         self.bottom_frame.setFrameShape(QFrame.Panel)
         self.bottom_layout = QGridLayout()
-        self.bottom_layout.addWidget(self.line_input, 4, 0, 1, 2)
-        self.bottom_layout.addWidget(self.text_log, 5, 0, 1, 2)
+        self.bottom_layout.addWidget(self.label_local, 0, 0, 1, 2)
+        self.bottom_layout.addWidget(self.local_log, 1, 0, 2, 2)
+        self.bottom_layout.addWidget(self.label_hub, 0, 2, 1, 1)
+        self.bottom_layout.addWidget(self.hub_log, 1, 2, 1, 1)
+        self.bottom_layout.addWidget(self.command_input, 2, 2, 1, 1)
         self.bottom_frame.setLayout(self.bottom_layout)
         # view - toplevel
         self.layout = QGridLayout()
@@ -311,10 +332,15 @@ class RemoteConsole(QDialog):
         self.layout.addWidget(self.bottom_frame, 2, 0, 1, 2)
         self.setLayout(self.layout)
 
-    # Logs text to the logger.
-    def log_text(self, text, end="\n"):
-        self.text_log.moveCursor(QTextCursor.End)
-        self.text_log.insertPlainText(text + end)
+    # Logs text to the local logger.
+    def log_local(self, text, end="\n"):
+        self.local_log.moveCursor(QTextCursor.End)
+        self.local_log.insertPlainText(text + end)
+
+    # Logs text to the hub logger.
+    def log_hub(self, text, end="\n"):
+        self.hub_log.moveCursor(QTextCursor.End)
+        self.hub_log.insertPlainText(text + end)
 
     async def start_hub(self):
         self.button_connect.setText("Click when hub is started")
@@ -324,7 +350,7 @@ class RemoteConsole(QDialog):
 
     async def connect_hub(self):
         self.hub_connect_state = HUB_CONNECTING
-        self.log_text("pc> Hub is started")
+        self.log_local("Hub is started")
         self.button_connect.setText("")
         self.label_connect.setText("Scan to find the hub")
         set_label_color(self.label_connect, "Magenta")
@@ -334,18 +360,18 @@ class RemoteConsole(QDialog):
         device = await BleakScanner.find_device_by_name(hub_name)
         if device is None:
             self.hub_connect_state = HUB_DISCONNECTED
-            self.log_text(f"pc> Could not find hub with name: {hub_name}")
+            self.log_local(f"Could not find hub with name: {hub_name}")
             self.button_connect.setText("connect to hub")
             self.label_connect.setText("disconnected")
             set_label_color(self.label_connect, "Gray")
             return
         # Hub found.
-        self.log_text(f"pc> Hub found with name: {hub_name}")
+        self.log_local(f"Hub found with name: {hub_name}")
 
         # Connect to the hub.
         self.client = BleakClient(device)
         await self.client.connect()
-        self.log_text("pc> Hub is connected")
+        self.log_local("Hub is connected")
         self.device = device
 
         # Initialize the sender channel to the hub.
@@ -354,7 +380,7 @@ class RemoteConsole(QDialog):
         # Subscribe to notifications from the hub.
         await self.hub_client.start_notify()
         self.hub_connect_state = HUB_CONNECTED
-        self.log_text("pc> Hub notifications started")
+        self.log_local("Hub notifications started")
         # Tell user to start program on the hub.
         self.label_connect.setText("Start program with hub button")
         set_label_color(self.label_connect, "Yellow")
@@ -362,7 +388,7 @@ class RemoteConsole(QDialog):
         # Waits until a ready response has been sent from the hub.
         await self.hub_client.wait_send_ready()
         self.hub_connect_state = HUB_RUNNING
-        self.log_text("pc> Hub running.")
+        self.log_local("Hub running.")
         self.button_connect.setText("disconnect from hub")
         self.label_connect.setText("running")
         set_label_color(self.label_connect, "Green")
@@ -381,7 +407,7 @@ class RemoteConsole(QDialog):
 
     def create_send_task(self, command, arg=""):
         if self.hub_connect_state != HUB_RUNNING:
-            self.log_text("pc> error: not connected to hub")
+            self.log_local("error: not connected to hub")
             return
         if len(arg) > 0:
             command += " " + arg
@@ -486,10 +512,10 @@ class RemoteConsole(QDialog):
         self.create_send_task(self.console_config.rightMinus["command"])
 
     @Slot()
-    def line_input_return_pressed(self):
-        text = self.line_input.text()
-        self.log_text(text)
-        self.line_input.setText("")
+    def command_input_return_pressed(self):
+        hub_command = self.command_input.text()
+        self.command_input.setText("")
+        self.create_send_task(hub_command)
 
 # Run the main async program.
 if __name__ == "__main__":
