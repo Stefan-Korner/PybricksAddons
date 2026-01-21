@@ -1,6 +1,28 @@
 [
 	{
 		"hubName": "Technic Hub 1",
+		"telemetry": {
+			"parameter1col1": "par1",
+			"parameter2col1": "par2",
+			"parameter3col1": "par3",
+			"parameter4col1": "par4",
+			"parameter5col1": "par5",
+			"parameter1col2": "par6",
+			"parameter2col2": "par7",
+			"parameter3col2": "par8",
+			"parameter4col2": "par9",
+			"parameter5col2": "par10",
+			"parameter1col3": "par11",
+			"parameter2col3": "par12",
+			"parameter3col3": "par13",
+			"parameter4col3": "par14",
+			"parameter5col3": "par15",
+			"parameter1col4": "par16",
+			"parameter2col4": "par17",
+			"parameter3col4": "par18",
+			"parameter4col4": "par19",
+			"parameter5col4": "par20"
+		},
 		"f1": {
 			"label": "A 1",
 			"color": "DarkCyan",

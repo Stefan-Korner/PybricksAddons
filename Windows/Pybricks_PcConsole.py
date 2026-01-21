@@ -3,7 +3,8 @@ from bleak import BleakScanner, BleakClient
 import PySide6.QtAsyncio as QtAsyncio
 from PySide6.QtGui import (QColor, QColorConstants, QFont, QPalette, QTextCursor)
 from PySide6.QtWidgets import (QApplication, QDialog, QFrame, QGridLayout,
-                               QLabel, QLineEdit, QPlainTextEdit, QPushButton)
+                               QHeaderView, QLabel, QLineEdit, QPlainTextEdit,
+                               QPushButton, QTableWidget, QTableWidgetItem)
 from PySide6.QtCore import QSize, Slot
 
 CONFIG_FILE_NAME = "Pybricks_PcConsole.json"
@@ -15,17 +16,19 @@ HUB_NAMES = ["Technic Hub 1"]
 PROMPT = ">>> "
 PROMPT_LEN = len(PROMPT)
 
-BUTTON_WIDTH = 60
-BUTTON_HEIGTH = 30
-INPUT_WIDTH = 60
-INPUT_HEIGTH = 30
-
 HUB_DISCONNECTED = 0
 HUB_REQUEST_ON = 1
 HUB_CONNECTING = 2
 HUB_CONNECTED = 3
 HUB_RUNNING = 4
 HUB_DISCONNECTING = 5
+
+BUTTON_WIDTH = 60
+BUTTON_HEIGTH = 30
+INPUT_WIDTH = 60
+INPUT_HEIGTH = 30
+TELEMETRY_ROWS = 5
+TELEMETRY_COLUMNS = 8
 
 def set_label_color(label, color_name):
     color = getattr(QColorConstants, color_name)
@@ -135,6 +138,103 @@ class RemoteConsole(QDialog):
         self.top_layout.addWidget(self.label_connect, 1, 0, 1, 1)
         self.top_layout.addWidget(self.button_connect, 2, 0, 1, 1)
         self.top_frame.setLayout(self.top_layout)
+        # view - telemetry frame
+        self.telemetry_frame = QFrame()
+        self.telemetry_label = QLabel("Telemetry")
+        self.telemetry_table = QTableWidget(TELEMETRY_ROWS, TELEMETRY_COLUMNS)
+        self.telemetry_table.setHorizontalHeaderLabels(
+            ["Name              ", "Value                "] * int(TELEMETRY_COLUMNS / 2))
+        header = self.telemetry_table.horizontalHeader()
+        for column in range(TELEMETRY_COLUMNS):
+            header.setSectionResizeMode(column, QHeaderView.ResizeToContents)
+        parameter1col1 = self.console_config.telemetry["parameter1col1"]
+        parameter2col1 = self.console_config.telemetry["parameter2col1"]
+        parameter3col1 = self.console_config.telemetry["parameter3col1"]
+        parameter4col1 = self.console_config.telemetry["parameter4col1"]
+        parameter5col1 = self.console_config.telemetry["parameter5col1"]
+        parameter1col2 = self.console_config.telemetry["parameter1col2"]
+        parameter2col2 = self.console_config.telemetry["parameter2col2"]
+        parameter3col2 = self.console_config.telemetry["parameter3col2"]
+        parameter4col2 = self.console_config.telemetry["parameter4col2"]
+        parameter5col2 = self.console_config.telemetry["parameter5col2"]
+        parameter1col3 = self.console_config.telemetry["parameter1col3"]
+        parameter2col3 = self.console_config.telemetry["parameter2col3"]
+        parameter3col3 = self.console_config.telemetry["parameter3col3"]
+        parameter4col3 = self.console_config.telemetry["parameter4col3"]
+        parameter5col3 = self.console_config.telemetry["parameter5col3"]
+        parameter1col4 = self.console_config.telemetry["parameter1col4"]
+        parameter2col4 = self.console_config.telemetry["parameter2col4"]
+        parameter3col4 = self.console_config.telemetry["parameter3col4"]
+        parameter4col4 = self.console_config.telemetry["parameter4col4"]
+        parameter5col4 = self.console_config.telemetry["parameter5col4"]
+        self.telemetry_items = {
+            parameter1col1: QTableWidgetItem(),
+            parameter2col1: QTableWidgetItem(),
+            parameter3col1: QTableWidgetItem(),
+            parameter4col1: QTableWidgetItem(),
+            parameter5col1: QTableWidgetItem(),
+            parameter1col2: QTableWidgetItem(),
+            parameter2col2: QTableWidgetItem(),
+            parameter3col2: QTableWidgetItem(),
+            parameter4col2: QTableWidgetItem(),
+            parameter5col2: QTableWidgetItem(),
+            parameter1col3: QTableWidgetItem(),
+            parameter2col3: QTableWidgetItem(),
+            parameter3col3: QTableWidgetItem(),
+            parameter4col3: QTableWidgetItem(),
+            parameter5col3: QTableWidgetItem(),
+            parameter1col4: QTableWidgetItem(),
+            parameter2col4: QTableWidgetItem(),
+            parameter3col4: QTableWidgetItem(),
+            parameter4col4: QTableWidgetItem(),
+            parameter5col4: QTableWidgetItem()
+        }
+        self.telemetry_table.setItem(0, 0, QTableWidgetItem(parameter1col1))
+        self.telemetry_table.setItem(1, 0, QTableWidgetItem(parameter2col1))
+        self.telemetry_table.setItem(2, 0, QTableWidgetItem(parameter3col1))
+        self.telemetry_table.setItem(3, 0, QTableWidgetItem(parameter4col1))
+        self.telemetry_table.setItem(4, 0, QTableWidgetItem(parameter5col1))
+        self.telemetry_table.setItem(0, 1, self.telemetry_items[parameter1col1])
+        self.telemetry_table.setItem(1, 1, self.telemetry_items[parameter2col1])
+        self.telemetry_table.setItem(2, 1, self.telemetry_items[parameter3col1])
+        self.telemetry_table.setItem(3, 1, self.telemetry_items[parameter4col1])
+        self.telemetry_table.setItem(4, 1, self.telemetry_items[parameter5col1])
+        self.telemetry_table.setItem(0, 2, QTableWidgetItem(parameter1col2))
+        self.telemetry_table.setItem(1, 2, QTableWidgetItem(parameter2col2))
+        self.telemetry_table.setItem(2, 2, QTableWidgetItem(parameter3col2))
+        self.telemetry_table.setItem(3, 2, QTableWidgetItem(parameter4col2))
+        self.telemetry_table.setItem(4, 2, QTableWidgetItem(parameter5col2))
+        self.telemetry_table.setItem(0, 3, self.telemetry_items[parameter1col2])
+        self.telemetry_table.setItem(1, 3, self.telemetry_items[parameter2col2])
+        self.telemetry_table.setItem(2, 3, self.telemetry_items[parameter3col2])
+        self.telemetry_table.setItem(3, 3, self.telemetry_items[parameter4col2])
+        self.telemetry_table.setItem(4, 3, self.telemetry_items[parameter5col2])
+        self.telemetry_table.setItem(0, 4, QTableWidgetItem(parameter1col3))
+        self.telemetry_table.setItem(1, 4, QTableWidgetItem(parameter2col3))
+        self.telemetry_table.setItem(2, 4, QTableWidgetItem(parameter3col3))
+        self.telemetry_table.setItem(3, 4, QTableWidgetItem(parameter4col3))
+        self.telemetry_table.setItem(4, 4, QTableWidgetItem(parameter5col3))
+        self.telemetry_table.setItem(0, 5, self.telemetry_items[parameter1col3])
+        self.telemetry_table.setItem(1, 5, self.telemetry_items[parameter2col3])
+        self.telemetry_table.setItem(2, 5, self.telemetry_items[parameter3col3])
+        self.telemetry_table.setItem(3, 5, self.telemetry_items[parameter4col3])
+        self.telemetry_table.setItem(4, 5, self.telemetry_items[parameter5col3])
+        self.telemetry_table.setItem(0, 6, QTableWidgetItem(parameter1col4))
+        self.telemetry_table.setItem(1, 6, QTableWidgetItem(parameter2col4))
+        self.telemetry_table.setItem(2, 6, QTableWidgetItem(parameter3col4))
+        self.telemetry_table.setItem(3, 6, QTableWidgetItem(parameter4col4))
+        self.telemetry_table.setItem(4, 6, QTableWidgetItem(parameter5col4))
+        self.telemetry_table.setItem(0, 7, self.telemetry_items[parameter1col4])
+        self.telemetry_table.setItem(1, 7, self.telemetry_items[parameter2col4])
+        self.telemetry_table.setItem(2, 7, self.telemetry_items[parameter3col4])
+        self.telemetry_table.setItem(3, 7, self.telemetry_items[parameter4col4])
+        self.telemetry_table.setItem(4, 7, self.telemetry_items[parameter5col4])
+        self.telemetry_frame.setFrameShadow(QFrame.Sunken)
+        self.telemetry_frame.setFrameShape(QFrame.Panel)
+        self.telemetry_layout = QGridLayout()
+        self.telemetry_layout.addWidget(self.telemetry_label, 0, 0)
+        self.telemetry_layout.addWidget(self.telemetry_table, 1, 0)
+        self.telemetry_frame.setLayout(self.telemetry_layout)
         # view - left buttons frame
         self.left_buttons_frame = QFrame()
         self.button_f1 = QPushButton(self.console_config.f1["label"])
@@ -327,9 +427,10 @@ class RemoteConsole(QDialog):
         # view - toplevel
         self.layout = QGridLayout()
         self.layout.addWidget(self.top_frame, 0, 0, 1, 2)
-        self.layout.addWidget(self.left_buttons_frame, 1, 0, 1, 1)
-        self.layout.addWidget(self.right_buttons_frame, 1, 1, 1, 1)
-        self.layout.addWidget(self.bottom_frame, 2, 0, 1, 2)
+        self.layout.addWidget(self.telemetry_frame, 1, 0, 1, 2)
+        self.layout.addWidget(self.left_buttons_frame, 2, 0, 1, 1)
+        self.layout.addWidget(self.right_buttons_frame, 2, 1, 1, 1)
+        self.layout.addWidget(self.bottom_frame, 3, 0, 1, 2)
         self.setLayout(self.layout)
 
     # Logs text to the local logger.
