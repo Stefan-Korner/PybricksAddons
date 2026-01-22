@@ -3,6 +3,7 @@
 #******************************************************************************
 from pylib_async import WaitForRelativeTime
 from pylib_bg_logger import bg_log
+from pylib_telemetry import print_telemetry_parameter
 
 class Position:
     A: Position = "A"
@@ -33,9 +34,11 @@ def switch_task(motor, switch_name, target_position):
     bg_log("try " + switch_name + " to position " + str(target_position))
     if switch_position(motor) == target_position:
         bg_log(switch_name + " already has position " + str(target_position))
+        print_telemetry_parameter(switch_name, str(target_position))
         return None
     motor.reset_angle()
     switch_to_position(motor, target_position)
     yield WaitForRelativeTime(1)
     motor.stop()
+    print_telemetry_parameter(switch_name, str(target_position))
     return None

@@ -128,7 +128,7 @@ def console():
                 if motor:
                     # Calibrate the motor and wait until completed.
                     print("CALIBRATE", arg1, "...")
-                    s_event_loop.register_task(calibrate_motor_task(motor), "motor_task")
+                    s_event_loop.register_task(calibrate_motor_task(motor, "motor_" + arg1), "motor_task")
                     yield WaitForTaskCompleted("motor_task", 30)
             elif command == "D" or command == "DECALIBRATE":
                 if arg1 == "1":
@@ -144,7 +144,7 @@ def console():
                 if motor:
                     # Decalibrate the motor and wait until completed.
                     print("DECALIBRATE", arg1, "...")
-                    s_event_loop.register_task(decalibrate_motor_task(motor), "motor_task")
+                    s_event_loop.register_task(decalibrate_motor_task(motor, "motor_" + arg1), "motor_task")
                     yield WaitForTaskCompleted("motor_task", 30)
             s_command_tokens = None
             print_bg_log_messages_and_clean()

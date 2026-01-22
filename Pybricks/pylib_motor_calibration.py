@@ -3,6 +3,7 @@
 #******************************************************************************
 from pylib_async import WaitFor, WaitForRelativeTime
 from pylib_bg_logger import bg_log
+from pylib_telemetry import print_telemetry_parameter
 
 class WaitForMotorCalibrated(WaitFor):
 
@@ -18,15 +19,20 @@ class WaitForMotorCalibrated(WaitFor):
 
 # Asynchronous task for calibrating a motor.
 def calibrate_motor_task(motor, motor_id="default"):
-    bg_log(f"calibrate motor {motor_id} angle = {motor.angle()}")
+    angle = motor.angle()
+    bg_log(f"calibrate motor {motor_id} angle = {angle}")
+    print_telemetry_parameter(motor_id, str(angle))
     # Set the motor back zu zero position and wait until it is reached
     motor.reset_angle()
-    bg_log(f"motor absolute angle = {motor.angle()}")
+    angle = motor.angle()
+    bg_log(f"motor absolute angle = {angle}")
+    print_telemetry_parameter(motor_id, str(angle))
     motor.run_target(20, 0, wait=False)
     angle = yield WaitForMotorCalibrated(motor)
     # Stop the motor to stop controlling the position
     motor.stop()
     bg_log(f"calibration of motor {motor_id} done, angle = {angle}")
+    print_telemetry_parameter(motor_id, str(angle))
     return None
 
 # Asynchronous task for decalibrating a motor.
@@ -36,5 +42,7 @@ def decalibrate_motor_task(motor, motor_id="default"):
     motor.run(200)
     yield WaitForRelativeTime(2)
     motor.stop()
-    bg_log(f"decalibration of motor {motor_id} done, angle = {motor.angle()}")
+    angle = motor.angle()
+    bg_log(f"decalibration of motor {motor_id} done, angle = {angle}")
+    print_telemetry_parameter(motor_id, str(angle))
     return None

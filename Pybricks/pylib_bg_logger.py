@@ -33,7 +33,7 @@ def print_bg_log_messages_and_clean():
     global s_logger
     s_logger.print_log_messages_and_clean()
 
-# The bachgound logger instance.
+# The backgound logger instance.
 class Logger:
 
     def __init__(self, command_handler=None):
