@@ -16,6 +16,10 @@ HUB_NAMES = ["Technic Hub 1"]
 PROMPT = ">>> "
 PROMPT_LEN = len(PROMPT)
 
+TELEMETRY_KEY = "#"
+TELEMETRY_VALUE_START = "{"
+TELEMETRY_VALUE_STOP = "}"
+
 HUB_DISCONNECTED = 0
 HUB_REQUEST_ON = 1
 HUB_CONNECTING = 2
@@ -52,11 +56,12 @@ def set_button_text_color(button, color_name):
 # Encapsulates the ble client to remote control a hub.
 class HubClient:
 
-    def __init__(self, ble_client, event_char_uuid, hub_logger):
+    def __init__(self, ble_client, event_char_uuid, response_handler, hub_logger):
         self.ble_client = ble_client
         self.ready_event = asyncio.Event()
         self.event_char_uuid = event_char_uuid
         self.hub_logger = hub_logger
+        self.response_handler = response_handler
         self.send_is_ready = False
         self.response_buffer = ""
 
@@ -82,7 +87,7 @@ class HubClient:
             elif next_char == "\n":
                 # Complete line received: check if prompt
                 self.check_prompt()
-                self.handle_response_line(self.response_buffer)
+                self.response_handler.handle_response_line(self.response_buffer)
                 self.hub_logger.log_hub("")
                 self.response_buffer = ""
             else:
@@ -90,10 +95,6 @@ class HubClient:
                 self.response_buffer += next_char
         # Characters are received and added to response buffer: check if prompt
         self.check_prompt()
-
-    # Callback for receiving a complete response line.
-    def handle_response_line(self, response_line):
-        pass
 
     # Subscribe to notifications from the hub.
     async def start_notify(self):
@@ -154,88 +155,22 @@ class RemoteConsole(QDialog):
         header = self.telemetry_table.horizontalHeader()
         for column in range(TELEMETRY_COLUMNS):
             header.setSectionResizeMode(column, QHeaderView.ResizeToContents)
-        parameter1col1 = self.console_config.telemetry["parameter1col1"]
-        parameter2col1 = self.console_config.telemetry["parameter2col1"]
-        parameter3col1 = self.console_config.telemetry["parameter3col1"]
-        parameter4col1 = self.console_config.telemetry["parameter4col1"]
-        parameter5col1 = self.console_config.telemetry["parameter5col1"]
-        parameter1col2 = self.console_config.telemetry["parameter1col2"]
-        parameter2col2 = self.console_config.telemetry["parameter2col2"]
-        parameter3col2 = self.console_config.telemetry["parameter3col2"]
-        parameter4col2 = self.console_config.telemetry["parameter4col2"]
-        parameter5col2 = self.console_config.telemetry["parameter5col2"]
-        parameter1col3 = self.console_config.telemetry["parameter1col3"]
-        parameter2col3 = self.console_config.telemetry["parameter2col3"]
-        parameter3col3 = self.console_config.telemetry["parameter3col3"]
-        parameter4col3 = self.console_config.telemetry["parameter4col3"]
-        parameter5col3 = self.console_config.telemetry["parameter5col3"]
-        parameter1col4 = self.console_config.telemetry["parameter1col4"]
-        parameter2col4 = self.console_config.telemetry["parameter2col4"]
-        parameter3col4 = self.console_config.telemetry["parameter3col4"]
-        parameter4col4 = self.console_config.telemetry["parameter4col4"]
-        parameter5col4 = self.console_config.telemetry["parameter5col4"]
-        self.telemetry_items = {
-            parameter1col1: QTableWidgetItem(),
-            parameter2col1: QTableWidgetItem(),
-            parameter3col1: QTableWidgetItem(),
-            parameter4col1: QTableWidgetItem(),
-            parameter5col1: QTableWidgetItem(),
-            parameter1col2: QTableWidgetItem(),
-            parameter2col2: QTableWidgetItem(),
-            parameter3col2: QTableWidgetItem(),
-            parameter4col2: QTableWidgetItem(),
-            parameter5col2: QTableWidgetItem(),
-            parameter1col3: QTableWidgetItem(),
-            parameter2col3: QTableWidgetItem(),
-            parameter3col3: QTableWidgetItem(),
-            parameter4col3: QTableWidgetItem(),
-            parameter5col3: QTableWidgetItem(),
-            parameter1col4: QTableWidgetItem(),
-            parameter2col4: QTableWidgetItem(),
-            parameter3col4: QTableWidgetItem(),
-            parameter4col4: QTableWidgetItem(),
-            parameter5col4: QTableWidgetItem()
-        }
-        self.telemetry_table.setItem(0, 0, QTableWidgetItem(parameter1col1))
-        self.telemetry_table.setItem(1, 0, QTableWidgetItem(parameter2col1))
-        self.telemetry_table.setItem(2, 0, QTableWidgetItem(parameter3col1))
-        self.telemetry_table.setItem(3, 0, QTableWidgetItem(parameter4col1))
-        self.telemetry_table.setItem(4, 0, QTableWidgetItem(parameter5col1))
-        self.telemetry_table.setItem(0, 1, self.telemetry_items[parameter1col1])
-        self.telemetry_table.setItem(1, 1, self.telemetry_items[parameter2col1])
-        self.telemetry_table.setItem(2, 1, self.telemetry_items[parameter3col1])
-        self.telemetry_table.setItem(3, 1, self.telemetry_items[parameter4col1])
-        self.telemetry_table.setItem(4, 1, self.telemetry_items[parameter5col1])
-        self.telemetry_table.setItem(0, 2, QTableWidgetItem(parameter1col2))
-        self.telemetry_table.setItem(1, 2, QTableWidgetItem(parameter2col2))
-        self.telemetry_table.setItem(2, 2, QTableWidgetItem(parameter3col2))
-        self.telemetry_table.setItem(3, 2, QTableWidgetItem(parameter4col2))
-        self.telemetry_table.setItem(4, 2, QTableWidgetItem(parameter5col2))
-        self.telemetry_table.setItem(0, 3, self.telemetry_items[parameter1col2])
-        self.telemetry_table.setItem(1, 3, self.telemetry_items[parameter2col2])
-        self.telemetry_table.setItem(2, 3, self.telemetry_items[parameter3col2])
-        self.telemetry_table.setItem(3, 3, self.telemetry_items[parameter4col2])
-        self.telemetry_table.setItem(4, 3, self.telemetry_items[parameter5col2])
-        self.telemetry_table.setItem(0, 4, QTableWidgetItem(parameter1col3))
-        self.telemetry_table.setItem(1, 4, QTableWidgetItem(parameter2col3))
-        self.telemetry_table.setItem(2, 4, QTableWidgetItem(parameter3col3))
-        self.telemetry_table.setItem(3, 4, QTableWidgetItem(parameter4col3))
-        self.telemetry_table.setItem(4, 4, QTableWidgetItem(parameter5col3))
-        self.telemetry_table.setItem(0, 5, self.telemetry_items[parameter1col3])
-        self.telemetry_table.setItem(1, 5, self.telemetry_items[parameter2col3])
-        self.telemetry_table.setItem(2, 5, self.telemetry_items[parameter3col3])
-        self.telemetry_table.setItem(3, 5, self.telemetry_items[parameter4col3])
-        self.telemetry_table.setItem(4, 5, self.telemetry_items[parameter5col3])
-        self.telemetry_table.setItem(0, 6, QTableWidgetItem(parameter1col4))
-        self.telemetry_table.setItem(1, 6, QTableWidgetItem(parameter2col4))
-        self.telemetry_table.setItem(2, 6, QTableWidgetItem(parameter3col4))
-        self.telemetry_table.setItem(3, 6, QTableWidgetItem(parameter4col4))
-        self.telemetry_table.setItem(4, 6, QTableWidgetItem(parameter5col4))
-        self.telemetry_table.setItem(0, 7, self.telemetry_items[parameter1col4])
-        self.telemetry_table.setItem(1, 7, self.telemetry_items[parameter2col4])
-        self.telemetry_table.setItem(2, 7, self.telemetry_items[parameter3col4])
-        self.telemetry_table.setItem(3, 7, self.telemetry_items[parameter4col4])
-        self.telemetry_table.setItem(4, 7, self.telemetry_items[parameter5col4])
+        # Create table widget items for all configured telemetry parameters
+        # and fill it up into the telemetry table.
+        self.telemetry_items = dict()
+        for col in range(1, 5):
+            for row in range(1, 6):
+                config_item_name = f"parameter{row}col{col}"
+                parameter_name = self.console_config.telemetry[config_item_name]
+                if len(parameter_name) > 0:
+                    table_row = row - 1
+                    table_col_name = (col - 1) * 2
+                    table_col_value = table_col_name + 1
+                    name_item = QTableWidgetItem(parameter_name)
+                    value_item = QTableWidgetItem()
+                    self.telemetry_table.setItem(table_row, table_col_name, name_item)
+                    self.telemetry_table.setItem(table_row, table_col_value, value_item)
+                    self.telemetry_items[parameter_name] = value_item
         self.telemetry_frame.setFrameShadow(QFrame.Sunken)
         self.telemetry_frame.setFrameShape(QFrame.Panel)
         self.telemetry_layout = QGridLayout()
@@ -483,7 +418,7 @@ class RemoteConsole(QDialog):
         self.device = device
 
         # Initialize the sender channel to the hub.
-        self.hub_client = HubClient(self.client, PYBRICKS_COMMAND_EVENT_CHAR_UUID, self)
+        self.hub_client = HubClient(self.client, PYBRICKS_COMMAND_EVENT_CHAR_UUID, self, self)
 
         # Subscribe to notifications from the hub.
         await self.hub_client.start_notify()
@@ -521,6 +456,25 @@ class RemoteConsole(QDialog):
             command += " " + arg
         binary_command = command.encode("ascii")
         asyncio.create_task(self.hub_client.send(binary_command))
+
+    # Callback for receiving a complete response line.
+    def handle_response_line(self, response_line):
+        # Extract telemetry parameters.
+        parameters = response_line.split(TELEMETRY_KEY)
+        # The first parameter is invalid.
+        for parameter in parameters[1:]:
+            parameter_pieces = parameter.split(TELEMETRY_VALUE_START)
+            parameter_name = parameter_pieces[0]
+            parameter_pieces2 = parameter_pieces[1]
+            parameter_pieces3 = parameter_pieces2.split(TELEMETRY_VALUE_STOP)
+            parameter_value = parameter_pieces3[0]
+            self.set_telemetry_parameter(parameter_name, parameter_value)
+
+    # Set a telemetry parameter in the telemetry table.
+    def set_telemetry_parameter(self, parameter_name, parameter_value):
+        # Set the parameter in the telemetry table if registered.
+        if parameter_name in self.telemetry_items:
+            self.telemetry_items[parameter_name].setText(parameter_value)
 
     @Slot()
     def button_connect_clicked(self):
