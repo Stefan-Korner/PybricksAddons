@@ -40,6 +40,12 @@ pylib_railroad_switch.py
 
 Provides a control task for motors that are driving railroad switches.
 
+pylib_telemetry.py
+------------------
+
+Support telemetry parameters that are printed on the console and therfore
+also received from a parent application.
+
 Programs:
 =========
 
