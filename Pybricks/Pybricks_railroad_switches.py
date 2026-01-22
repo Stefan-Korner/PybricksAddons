@@ -9,6 +9,7 @@ from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
 from pylib_motor_calibration import calibrate_motor_task, decalibrate_motor_task
 from pylib_railroad_switch import Position, print_position, switch_task
+from pylib_telemetry import enable_telemetry, disable_telemetry
 
 s_event_loop = None
 s_running = True
@@ -26,6 +27,8 @@ def print_commands():
         print("B | SWITCH_TO_B <motor> ... switch motor [1...4] to position A")
         print("C | CALIBRATE <motor> ..... calibrates the motor [1...4]")
         print("D | DECALIBRATE <motor> ... decalibrates the motor [1...4]")
+        print("T | TELEMETRY_ENABLE ...... enables telemetry printing")
+        print("U | TELEMETRY_DISABLE ..... disables telemetry printing")
 
 def print_switch_positions():
     global s_motor1, s_motor2, s_motor3, s_motor4
@@ -60,6 +63,10 @@ def handle(command_line):
         # Processing of the command is done in the console task.
         # Don't show the prompt, this shall be done when the task is finished.
         return False
+    elif command == "T" or command == "TELEMETRY_ENABLE":
+        enable_telemetry()
+    elif command == "U" or command == "TELEMETRY_DISABLE":
+        disable_telemetry()
     s_command_tokens = None
     # Show the prompt when True.
     return s_running
@@ -78,7 +85,7 @@ def console():
     while s_running:
         console_handler.poll()
         if s_command_tokens:
-            # Command processing shall be done here, bacause yield must be
+            # Command processing shall be done here, because yield must be
             # called here and not in a sub-function.
             command = "".join(s_command_tokens[0:1]).upper()
             arg1 = "".join(s_command_tokens[1:2])
