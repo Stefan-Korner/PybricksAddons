@@ -84,16 +84,16 @@
 			"command": "B"
 		},
 		"f11": {
-			"label": "F11",
+			"label": "Telem+",
 			"color": "White",
 			"textColor": "Black",
-			"command": ""
+			"command": "T"
 		},
 		"f12": {
-			"label": "F12",
+			"label": "Telem-",
 			"color": "White",
 			"textColor": "Black",
-			"command": ""
+			"command": "U"
 		},
 		"leftPlus": {
 			"command": "L_U"
