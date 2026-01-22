@@ -60,15 +60,18 @@ class HubClient:
         self.send_is_ready = False
         self.response_buffer = ""
 
+    # Checks if a prompt is in the response buffer and set the ready event
+    def check_prompt(self):
+        if len(self.response_buffer) >= PROMPT_LEN:
+            if PROMPT in self.response_buffer:
+                self.ready_event.set()
+
     # Callback for receiving data.
     def handle_rx(self, _, data: bytearray):
         # "write stdout" event (0x01)
         if data[0] == 0x01:
             payload = data[1:].decode("utf-8")
             self.handle_next_payload(payload)
-            if len(payload) >= PROMPT_LEN:
-                if payload[-PROMPT_LEN:] == PROMPT:
-                    self.ready_event.set()
 
     # Callback for receiving next payload characters.
     def handle_next_payload(self, payload):
@@ -77,12 +80,16 @@ class HubClient:
                 # ignore the return before the newline
                 pass
             elif next_char == "\n":
+                # Complete line received: check if prompt
+                self.check_prompt()
                 self.handle_response_line(self.response_buffer)
                 self.hub_logger.log_hub("")
                 self.response_buffer = ""
             else:
                 self.hub_logger.log_hub(next_char, end="")
                 self.response_buffer += next_char
+        # Characters are received and added to response buffer: check if prompt
+        self.check_prompt()
 
     # Callback for receiving a complete response line.
     def handle_response_line(self, response_line):
