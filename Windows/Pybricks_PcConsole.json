@@ -116,5 +116,123 @@
 		"RightMinus": {
 			"command": "R_D"
 		}
+	},
+	{
+		"hubName": "Technic Hub 2",
+		"telemetry": {
+			"parameter1col1": "motor_1",
+			"parameter2col1": "motor_2",
+			"parameter3col1": "motor_3",
+			"parameter4col1": "motor_4",
+			"parameter5col1": "",
+			"parameter1col2": "",
+			"parameter2col2": "",
+			"parameter3col2": "",
+			"parameter4col2": "",
+			"parameter5col2": "",
+			"parameter1col3": "",
+			"parameter2col3": "",
+			"parameter3col3": "",
+			"parameter4col3": "",
+			"parameter5col3": "",
+			"parameter1col4": "",
+			"parameter2col4": "",
+			"parameter3col4": "",
+			"parameter4col4": "",
+			"parameter5col4": ""
+		},
+		"f1": {
+			"label": "A 1",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "A 1"
+		},
+		"f2": {
+			"label": "A 2",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "A 2"
+		},
+		"f3": {
+			"label": "A 3",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "A 3"
+		},
+		"f4": {
+			"label": "A 4",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "A 4"
+		},
+		"f5": {
+			"label": "B 1",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "B 1"
+		},
+		"f6": {
+			"label": "B 2",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "B 2"
+		},
+		"f7": {
+			"label": "B 3",
+			"color": "DarkMagenta",
+			"textColor": "White",
+			"command": "B 3"
+		},
+		"f8": {
+			"label": "B 4",
+			"color": "DarkCyan",
+			"textColor": "White",
+			"command": "B 4"
+		},
+		"f9": {
+			"label": "A",
+			"color": "Blue",
+			"textColor": "White",
+			"command": "A"
+		},
+		"f10": {
+			"label": "B",
+			"color": "Blue",
+			"textColor": "White",
+			"command": "B"
+		},
+		"f11": {
+			"label": "Telem+",
+			"color": "White",
+			"textColor": "Black",
+			"command": "T"
+		},
+		"f12": {
+			"label": "Telem-",
+			"color": "White",
+			"textColor": "Black",
+			"command": "U"
+		},
+		"leftPlus": {
+			"command": "L_U"
+		},
+		"left": {
+			"command": "L__"
+		},
+		"leftMinus": {
+			"command": "L_D"
+		},
+		"middle": {
+			"command": "M__"
+		},
+		"rightPlus": {
+			"command": "R_U"
+		},
+		"right": {
+			"command": "R__"
+		},
+		"RightMinus": {
+			"command": "R_D"
+		}
 	}
 ]
