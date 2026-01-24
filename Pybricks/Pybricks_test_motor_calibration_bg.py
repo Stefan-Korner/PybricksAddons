@@ -1,5 +1,5 @@
 #******************************************************************************
-# Tests the pylib_motor_calibration with non-blocking background tasks.       *
+# Tests the pylib_motor calibration with non-blocking background tasks.       *
 #******************************************************************************
 from pybricks.hubs import ThisHub
 from pybricks.parameters import Port
@@ -7,7 +7,7 @@ from pybricks.pupdevices import Motor
 from pylib_async import EventLoop, WaitForRelativeTime
 from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
-from pylib_motor_calibration import calibrate_motor_task, decalibrate_motor_task
+from pylib_motor import calibrate_motor_task, decalibrate_motor_task
 from pylib_telemetry import enable_telemetry, disable_telemetry
 
 s_event_loop = None

@@ -7,7 +7,7 @@ from pybricks.pupdevices import Motor
 from pylib_async import EventLoop, WaitForRelativeTime, WaitForTaskCompleted
 from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
-from pylib_motor_calibration import calibrate_motor_task, decalibrate_motor_task
+from pylib_motor import calibrate_motor_task, decalibrate_motor_task
 from pylib_railroad_switch import Position, print_position, switch_task
 from pylib_telemetry import enable_telemetry, disable_telemetry
 

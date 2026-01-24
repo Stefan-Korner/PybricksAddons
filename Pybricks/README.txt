@@ -29,8 +29,8 @@ ConsoleHandler provides a prompt ">>> " to support a synchonization for a
 parent application. The class is designed to support a non-blocking reading
 from stdin.
 
-pylib_motor_calibration.py
---------------------------
+pylib_motor.py
+--------------
 
 Provides a calibation task (motor in zero position) and a de-calibration task
 (motor runs for 2 seconds).
