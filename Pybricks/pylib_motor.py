@@ -1,6 +1,7 @@
 #******************************************************************************
 # Provides retrieval, calibrating and de-calibration of a motor.              *
 #******************************************************************************
+from pybricks.pupdevices import Motor
 from pylib_async import WaitFor, WaitForRelativeTime
 from pylib_bg_logger import bg_log
 from pylib_telemetry import print_telemetry_parameter
@@ -9,11 +10,11 @@ from pylib_telemetry import print_telemetry_parameter
 def get_motor(port, motor_id=""):
     try:
         ret_val = Motor(port)
-        if motor_name != "":
+        if motor_id != "":
             print(f"{motor_id} on {port} found")
         return ret_val
     except:
-        if motor_name != "":
+        if motor_id != "":
             print(f"{motor_id} on {port} not found")
         return None
 

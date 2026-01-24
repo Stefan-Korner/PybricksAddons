@@ -3,7 +3,6 @@
 #******************************************************************************
 from pybricks.hubs import ThisHub
 from pybricks.parameters import Port
-from pybricks.pupdevices import Motor
 from pylib_async import EventLoop, WaitForRelativeTime
 from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
@@ -21,15 +20,15 @@ s_motor4 = None
 
 # Print available commands.
 def print_commands():
-        print("X | EXIT .................. terminates the program")
-        print("? | HELP .................. prints available commands")
-        print("A | SWITCH_TO_A <motor> ... switch motor [1...4] to position A")
-        print("B | SWITCH_TO_B <motor> ... switch motor [1...4] to position A")
-        print("C | CALIBRATE <motor> ..... calibrates the motor [1...4]")
-        print("D | DECALIBRATE <motor> ... decalibrates the motor [1...4]")
-        print("L | BACKGROUND_LOG ........ prints the background log")
-        print("T | TELEMETRY_ENABLE ...... enables telemetry printing")
-        print("U | TELEMETRY_DISABLE ..... disables telemetry printing")
+    print("X | EXIT .................. terminates the program")
+    print("? | HELP .................. prints available commands")
+    print("A | SWITCH_TO_A <motor> ... switch motor [1...4] to position A")
+    print("B | SWITCH_TO_B <motor> ... switch motor [1...4] to position A")
+    print("C | CALIBRATE <motor> ..... calibrates the motor [1...4]")
+    print("D | DECALIBRATE <motor> ... decalibrates the motor [1...4]")
+    print("L | BACKGROUND_LOG ........ prints the background log")
+    print("T | TELEMETRY_ENABLE ...... enables telemetry printing")
+    print("U | TELEMETRY_DISABLE ..... disables telemetry printing")
 
 def print_switch_positions():
     global s_motor1, s_motor2, s_motor3, s_motor4
@@ -78,10 +77,10 @@ def handle(command_line):
 def console():
     global s_event_loop, s_running, s_command_tokens, s_motor1, s_motor2, s_motor3, s_motor4
     print("console started")
-    motor1 = get_motor(Port.A, "motor 1")
-    motor2 = get_motor(Port.B, "motor 2")
-    motor3 = get_motor(Port.C, "motor 3")
-    motor4 = get_motor(Port.D, "motor 4")
+    s_motor1 = get_motor(Port.A, "motor 1")
+    s_motor2 = get_motor(Port.B, "motor 2")
+    s_motor3 = get_motor(Port.C, "motor 3")
+    s_motor4 = get_motor(Port.D, "motor 4")
     print_commands()
     print_switch_positions()
     console_handler = ConsoleHandler(handle)

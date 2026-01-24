@@ -3,7 +3,6 @@
 #******************************************************************************
 from pybricks.hubs import ThisHub
 from pybricks.parameters import Port
-from pybricks.pupdevices import Motor
 from pylib_async import EventLoop, WaitForRelativeTime
 from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
@@ -16,13 +15,13 @@ s_command_tokens = None
 
 # Print available commands.
 def print_commands():
-        print("X | EXIT .................. terminates the program")
-        print("? | HELP .................. prints available commands")
-        print("C | CALIBRATE <motor> ..... calibrates the motor [1...4]")
-        print("D | DECALIBRATE <motor> ... decalibrates the motor [1...4]")
-        print("L | BACKGROUND_LOG ........ prints the background log")
-        print("T | TELEMETRY_ENABLE ...... enables telemetry printing")
-        print("U | TELEMETRY_DISABLE ..... disables telemetry printing")
+    print("X | EXIT .................. terminates the program")
+    print("? | HELP .................. prints available commands")
+    print("C | CALIBRATE <motor> ..... calibrates the motor [1...4]")
+    print("D | DECALIBRATE <motor> ... decalibrates the motor [1...4]")
+    print("L | BACKGROUND_LOG ........ prints the background log")
+    print("T | TELEMETRY_ENABLE ...... enables telemetry printing")
+    print("U | TELEMETRY_DISABLE ..... disables telemetry printing")
 
 # Handle the command line.
 def handle(command_line):
