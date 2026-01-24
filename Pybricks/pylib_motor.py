@@ -1,9 +1,21 @@
 #******************************************************************************
-# Provides actions for de-calibrating and calibration a motor.                *
+# Provides retrieval, calibrating and de-calibration of a motor.              *
 #******************************************************************************
 from pylib_async import WaitFor, WaitForRelativeTime
 from pylib_bg_logger import bg_log
 from pylib_telemetry import print_telemetry_parameter
+
+# Retrieves a motor and return None if not found.
+def get_motor(port, motor_id=""):
+    try:
+        ret_val = Motor(port)
+        if motor_name != "":
+            print(f"{motor_id} on {port} found")
+        return ret_val
+    except:
+        if motor_name != "":
+            print(f"{motor_id} on {port} not found")
+        return None
 
 class WaitForMotorCalibrated(WaitFor):
 

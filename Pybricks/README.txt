@@ -32,7 +32,8 @@ from stdin.
 pylib_motor.py
 --------------
 
-Provides a calibation task (motor in zero position) and a de-calibration task
+Provides retrieval of a motor, a calibation task (motor in zero position) and
+a de-calibration task.
 (motor runs for 2 seconds).
 
 pylib_railroad_switch.py

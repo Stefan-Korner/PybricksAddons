@@ -7,7 +7,7 @@ from pybricks.pupdevices import Motor
 from pylib_async import EventLoop, WaitForRelativeTime, WaitForTaskCompleted
 from pylib_bg_logger import print_bg_log_messages_and_clean
 from pylib_console import ConsoleHandler, print_prompt
-from pylib_motor import calibrate_motor_task, decalibrate_motor_task
+from pylib_motor import calibrate_motor_task, decalibrate_motor_task, get_motor
 from pylib_railroad_switch import Position, print_position, switch_task
 from pylib_telemetry import enable_telemetry, disable_telemetry
 
@@ -75,10 +75,10 @@ def handle(command_line):
 def console():
     global s_event_loop, s_running, s_command_tokens, s_motor1, s_motor2, s_motor3, s_motor4
     print("console started")
-    s_motor1 = Motor(Port.A)
-    s_motor2 = Motor(Port.B)
-    s_motor3 = Motor(Port.C)
-    s_motor4 = Motor(Port.D)
+    motor1 = get_motor(Port.A, "motor 1")
+    motor2 = get_motor(Port.B, "motor 2")
+    motor3 = get_motor(Port.C, "motor 3")
+    motor4 = get_motor(Port.D, "motor 4")
     print_commands()
     print_switch_positions()
     console_handler = ConsoleHandler(handle)
